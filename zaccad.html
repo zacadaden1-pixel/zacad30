@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZACCAD 30 CHALLENGE</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="navbar"><div class="logo">ZACCAD 30 CHALLENGE</div></nav>
+
+    <section class="section hero-bg">
+        <div class="dashboard">
+            
+            <div class="stats-container">
+                <div class="stat-box">
+                    <h4>Perfect Days ✅</h4>
+                    <div id="perfectCount" class="count success">0</div>
+                </div>
+                <div class="stat-box">
+                    <h4>Missed Days ❌</h4>
+                    <div id="missedCount" class="count failed">0</div>
+                </div>
+                <div class="stat-box">
+                    <h4>Current Day</h4>
+                    <div id="displayCurrentDay" class="count accent-text">1</div>
+                </div>
+            </div>
+
+            <div class="main-layout">
+                <div class="left-col">
+                    <div class="status-card">
+                        <h3>Daily Habits</h3>
+                        <div id="habitInputs">
+                            <label class="habit-row"><input type="checkbox" class="habit-check" data-name="Gym"> 🏋️ Gym Workout</label>
+                            <label class="habit-row"><input type="checkbox" class="habit-check" data-name="NOT G"> 🚫 NOT G</label>
+                            <label class="habit-row"><input type="checkbox" class="habit-check" data-name="Read 30m"> 📚 Read (30 Min)</label>
+                            <label class="habit-row"><input type="checkbox" class="habit-check" data-name="1L Water"> 💧 Drink 1L Water</label>
+                        </div>
+                    </div>
+
+                    <div class="status-card" style="margin-top: 20px;">
+                        <h3>30-Day Progress</h3>
+                        <div class="day-grid" id="trackerGrid"></div>
+                        <div class="btn-group">
+                            <button class="btn btn-reset" onclick="resetCheckboxes()">RESET CHECKS</button>
+                            <button class="btn btn-submit" onclick="submitDay()">SUBMIT & NEXT DAY</button>
+                        </div>
+                        <div class="btn-group" style="margin-top: 10px;">
+                            <button class="btn" style="background: #ef4444; color: white; width: 100%;" onclick="resetAllData()">RESET ALL DATA (DAY 1)</button>
+                        </div>
+                    </div>
+
+                    <div class="status-card" style="margin-top: 20px;">
+                        <h3>History Review</h3>
+                        <div id="historyReview" class="review-panel">
+                            <p style="color:var(--text-secondary)">Click a day to see details.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="right-col">
+                    <div class="status-card">
+                        <h3 style="color:var(--accent);">🕌 5 Prayers</h3>
+                        <div id="prayerInputs">
+                            <label class="habit-row"><input type="checkbox" class="prayer-check" data-name="Fajr"> Fajr</label>
+                            <label class="habit-row"><input type="checkbox" class="prayer-check" data-name="Dhuhr"> Dhuhr</label>
+                            <label class="habit-row"><input type="checkbox" class="prayer-check" data-name="Asr"> Asr</label>
+                            <label class="habit-row"><input type="checkbox" class="prayer-check" data-name="Maghrib"> Maghrib</label>
+                            <label class="habit-row"><input type="checkbox" class="prayer-check" data-name="Isha"> Isha</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        let currentDay = parseInt(localStorage.getItem('zac_day')) || 1;
+        let history = JSON.parse(localStorage.getItem('zac_hist')) || {};
+
+        function updateStats() {
+            let perfect = 0; let missed = 0;
+            Object.values(history).forEach(day => { if(day.allDone) perfect++; else missed++; });
+            document.getElementById('perfectCount').innerText = perfect;
+            document.getElementById('missedCount').innerText = missed;
+            document.getElementById('displayCurrentDay').innerText = currentDay;
+        }
+
+        function init() {
+            const grid = document.getElementById('trackerGrid');
+            grid.innerHTML = '';
+            for (let i = 1; i <= 30; i++) {
+                const day = document.createElement('div');
+                day.classList.add('day-box');
+                day.innerText = i;
+                if(i === currentDay) day.classList.add('active');
+                if(history[i]) day.classList.add(history[i].allDone ? 'success' : 'failed');
+                day.onclick = () => showHistory(i);
+                grid.appendChild(day);
+            }
+            updateStats();
+        }
+
+        function resetCheckboxes() {
+            document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+        }
+
+        function resetAllData() {
+            if (confirm("Are you sure? This will delete all your history and restart from Day 1.")) {
+                localStorage.removeItem('zac_hist');
+                localStorage.removeItem('zac_day');
+                location.reload();
+            }
+        }
+
+        function submitDay() {
+            let dayData = { habits: [], prayers: [], allDone: true };
+            document.querySelectorAll('.habit-check').forEach(cb => {
+                dayData.habits.push({ name: cb.dataset.name, status: cb.checked });
+                if(!cb.checked) dayData.allDone = false;
+            });
+            document.querySelectorAll('.prayer-check').forEach(cb => {
+                dayData.prayers.push({ name: cb.dataset.name, status: cb.checked });
+                if(!cb.checked) dayData.allDone = false;
+            });
+            history[currentDay] = dayData;
+            currentDay++;
+            localStorage.setItem('zac_hist', JSON.stringify(history));
+            localStorage.setItem('zac_day', currentDay);
+            resetCheckboxes();
+            init();
+        }
+
+        function showHistory(dayNum) {
+            const review = document.getElementById('historyReview');
+            const data = history[dayNum];
+            if(!data) { review.innerHTML = `<p>No data for Day ${dayNum}.</p>`; return; }
+            let habitHtml = data.habits.map(h => `<div>${h.status ? '✅' : '❌'} ${h.name}</div>`).join('');
+            let prayerHtml = data.prayers.map(p => `<div>${p.status ? '🕌' : '⚪'} ${p.name}</div>`).join('');
+            review.innerHTML = `<div class="review-flex">
+                <div class="review-cat"><h4>Habits</h4>${habitHtml}</div>
+                <div class="review-cat"><h4>Prayers</h4>${prayerHtml}</div>
+            </div>`;
+        }
+        init();
+    </script>
+</body>
+</html>
