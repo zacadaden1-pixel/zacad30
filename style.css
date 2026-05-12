@@ -15,14 +15,16 @@ body { background-color: var(--bg-main); color: var(--text-primary); overflow-x:
 .navbar { padding: 1.2rem; background: #0f172a; border-bottom: 1px solid #334155; text-align: center; }
 .logo { font-size: 1.2rem; font-weight: 800; color: var(--accent); letter-spacing: 2px; }
 
+/* --- BACKGROUND CONFIG --- */
 .hero-bg {
     min-height: 100vh;
     width: 100%;
+    /* Layered gradient to protect text visibility while showing the image */
     background-image: 
-        linear-gradient(to right, rgba(15, 23, 42, 1) 0%, rgba(15, 23, 42, 0.7) 50%, rgba(15, 23, 42, 0) 100%),
+        linear-gradient(to right, rgba(15, 23, 42, 1) 0%, rgba(15, 23, 42, 0.6) 100%),
         url('Gemini_Generated_Image_3snzvf3snzvf3snz.png');
     background-size: cover;
-    background-position: right center;
+    background-position: right center; /* Default PC position */
     background-repeat: no-repeat;
     background-attachment: fixed;
     padding: 30px 5%;
@@ -49,16 +51,15 @@ body { background-color: var(--bg-main); color: var(--text-primary); overflow-x:
 .failed { color: var(--failed); }
 .accent-text { color: var(--accent); }
 
-/* --- REFINED GYM GROUP --- */
 .habit-row-group { 
     background: rgba(15, 23, 42, 0.5); 
-    padding: 15px; 
+    padding: 10px; 
     border-radius: 12px; 
     margin-bottom: 12px; 
-    border: 1px solid rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
 }
 
-.main-habit { background: transparent !important; padding: 0 !important; margin-bottom: 8px !important; }
+.main-habit { background: transparent !important; padding: 10px !important; margin-bottom: 0px !important; }
 
 .habit-row { 
     display: flex; 
@@ -67,24 +68,23 @@ body { background-color: var(--bg-main); color: var(--text-primary); overflow-x:
     padding: 12px; 
     border-radius: 10px; 
     margin-bottom: 8px; 
-    cursor: pointer; 
+    cursor: pointer;
 }
 
-input[type="checkbox"] { width: 20px; height: 20px; margin-right: 12px; accent-color: var(--accent); }
+input[type="checkbox"] { width: 20px; height: 20px; margin-right: 12px; accent-color: var(--accent); cursor: pointer; }
 
-/* --- PC-FRIENDLY REST BUTTON --- */
 .rest-day-label { 
-    font-size: 0.85rem; 
+    font-size: 0.8rem; 
     color: var(--accent); 
     display: flex; 
     align-items: center; 
     cursor: pointer; 
-    margin-left: 32px; 
-    padding: 5px 0;
+    margin-left: 42px; 
+    margin-bottom: 5px;
     width: fit-content;
 }
 
-.rest-day-label input { width: 16px !important; height: 16px !important; margin-right: 10px !important; }
+.rest-day-label input { width: 15px !important; height: 15px !important; margin-right: 8px !important; }
 
 .day-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(45px, 1fr)); gap: 8px; margin: 15px 0; }
 .day-box { aspect-ratio: 1; background: rgba(15, 23, 42, 0.8); border: 1px solid #334155; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; cursor: pointer; }
@@ -101,9 +101,21 @@ input[type="checkbox"] { width: 20px; height: 20px; margin-right: 12px; accent-c
 .review-panel { background: rgba(15, 23, 42, 0.8); padding: 12px; border-radius: 10px; margin-top: 10px; border: 1px solid #334155; }
 .review-flex { display: flex; justify-content: space-around; }
 
+/* --- MOBILE SPECIFIC FIXES --- */
 @media (max-width: 900px) {
     .main-layout { grid-template-columns: 1fr; }
-    .hero-bg { background-attachment: scroll; background-position: 80% center; padding: 20px 15px; }
+    
+    .hero-bg { 
+        background-attachment: scroll; 
+        /* SHIFTS IMAGE TO RIGHT SIDE SO FACE APPEARS ON MOBILE */
+        background-position: 90% center; 
+        padding: 20px 15px; 
+        /* Adds a dark overlay so text is still readable over your face */
+        background-image: 
+            linear-gradient(rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.85)),
+            url('Gemini_Generated_Image_3snzvf3snzvf3snz.png');
+    }
+    
     .stats-container { flex-direction: column; }
-    .rest-day-label { margin-left: 32px; }
+    .rest-day-label { margin-left: 42px; }
 }
