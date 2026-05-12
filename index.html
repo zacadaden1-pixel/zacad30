@@ -32,7 +32,11 @@
                     <div class="status-card">
                         <h3>Daily Habits</h3>
                         <div id="habitInputs">
-                            <label class="habit-row"><input type="checkbox" class="habit-check" data-name="Gym"> 🏋️ Gym Workout</label>
+                            <div class="habit-row-group">
+                                <label class="habit-row main-habit"><input type="checkbox" class="habit-check" data-name="Gym" id="gymCheck"> 🏋️ Gym Workout</label>
+                                <label class="rest-day-label"><input type="checkbox" id="gymRest"> Mark as Rest Day</label>
+                            </div>
+
                             <label class="habit-row"><input type="checkbox" class="habit-check" data-name="NOT G"> 🚫 NOT G</label>
                             <label class="habit-row"><input type="checkbox" class="habit-check" data-name="Read 30m"> 📚 Read (30 Min)</label>
                             <label class="habit-row"><input type="checkbox" class="habit-check" data-name="1L Water"> 💧 Drink 1L Water</label>
@@ -44,10 +48,10 @@
                         <div class="day-grid" id="trackerGrid"></div>
                         <div class="btn-group">
                             <button class="btn btn-reset" onclick="resetCheckboxes()">RESET CHECKS</button>
-                            <button class="btn btn-submit" onclick="submitDay()">SUBMIT & NEXT DAY</button>
+                            <button class="btn btn-submit" onclick="submitDay()">SUBMIT & NEXT</button>
                         </div>
                         <div class="btn-group" style="margin-top: 10px;">
-                            <button class="btn" style="background: #ef4444; color: white; width: 100%;" onclick="resetAllData()">RESET ALL DATA (DAY 1)</button>
+                            <button class="btn btn-danger" onclick="resetAllData()">RESET ALL DATA (DAY 1)</button>
                         </div>
                     </div>
 
@@ -107,23 +111,29 @@
         }
 
         function resetAllData() {
-            if (confirm("Are you sure? This will delete all your history and restart from Day 1.")) {
-                localStorage.removeItem('zac_hist');
-                localStorage.removeItem('zac_day');
+            if (confirm("Delete everything and start at Day 1?")) {
+                localStorage.clear();
                 location.reload();
             }
         }
 
         function submitDay() {
             let dayData = { habits: [], prayers: [], allDone: true };
+            const isRestDay = document.getElementById('gymRest').checked;
+            
             document.querySelectorAll('.habit-check').forEach(cb => {
-                dayData.habits.push({ name: cb.dataset.name, status: cb.checked });
-                if(!cb.checked) dayData.allDone = false;
+                let status = cb.checked;
+                let name = cb.dataset.name;
+                if(name === "Gym" && isRestDay) { status = true; name = "Gym (Rest)"; }
+                dayData.habits.push({ name: name, status: status });
+                if(!status) dayData.allDone = false;
             });
+
             document.querySelectorAll('.prayer-check').forEach(cb => {
                 dayData.prayers.push({ name: cb.dataset.name, status: cb.checked });
                 if(!cb.checked) dayData.allDone = false;
             });
+
             history[currentDay] = dayData;
             currentDay++;
             localStorage.setItem('zac_hist', JSON.stringify(history));
@@ -138,10 +148,7 @@
             if(!data) { review.innerHTML = `<p>No data for Day ${dayNum}.</p>`; return; }
             let habitHtml = data.habits.map(h => `<div>${h.status ? '✅' : '❌'} ${h.name}</div>`).join('');
             let prayerHtml = data.prayers.map(p => `<div>${p.status ? '🕌' : '⚪'} ${p.name}</div>`).join('');
-            review.innerHTML = `<div class="review-flex">
-                <div class="review-cat"><h4>Habits</h4>${habitHtml}</div>
-                <div class="review-cat"><h4>Prayers</h4>${prayerHtml}</div>
-            </div>`;
+            review.innerHTML = `<div class="review-flex"><div class="review-cat"><h4>Habits</h4>${habitHtml}</div><div class="review-cat"><h4>Prayers</h4>${prayerHtml}</div></div>`;
         }
         init();
     </script>
