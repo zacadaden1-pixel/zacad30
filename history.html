@@ -17,11 +17,49 @@
 
     <section class="section hero-bg">
         <div class="dashboard">
+            <div class="status-card" style="margin-bottom: 20px;">
+                <h3 style="color:var(--accent); margin-bottom: 20px;">Performance Analytics</h3>
+                <div class="analytics-grid">
+                    <div class="stat-item">
+                        <span class="stat-label">Challenge Completion</span>
+                        <div class="progress-bar-bg"><div id="compBar" class="progress-fill accent-bg"></div></div>
+                        <span id="compText" class="stat-value">0%</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Success Days Rate (70%+)</span>
+                        <div class="progress-bar-bg"><div id="perfBar" class="progress-fill success-bg"></div></div>
+                        <span id="perfText" class="stat-value">0%</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Missed Days Rate</span>
+                        <div class="progress-bar-bg"><div id="missBar" class="progress-fill failed-bg"></div></div>
+                        <span id="missText" class="stat-value">0%</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Avg. Daily Effort (Total Tasks)</span>
+                        <div class="progress-bar-bg"><div id="avgSuccBar" class="progress-fill" style="background: linear-gradient(90deg, #06b6d4, #22c55e);"></div></div>
+                        <span id="avgSuccText" class="stat-value">0%</span>
+                    </div>
+                </div>
+            </div>
+
             <div class="status-card">
                 <h3>30-Day Detailed History</h3>
-                <div id="fullHistoryList" class="history-list">
-                    </div>
-                <button class="btn btn-danger" style="margin-top:20px" onclick="clearAll()">RESET ENTIRE CHALLENGE</button>
+                <div class="table-container">
+                    <table class="history-table">
+                        <thead>
+                            <tr>
+                                <th>Day</th>
+                                <th>Score</th>
+                                <th>Status</th>
+                                <th>Habits</th>
+                                <th>Prayers</th>
+                            </tr>
+                        </thead>
+                        <tbody id="fullHistoryList"></tbody>
+                    </table>
+                </div>
+                <button class="btn btn-danger" style="margin-top:20px" onclick="clearAll()">RESET CHALLENGE</button>
             </div>
         </div>
     </section>
@@ -29,53 +67,58 @@
     <script>
         const historyData = JSON.parse(localStorage.getItem('zac_hist')) || {};
         
+        function updateAnalytics() {
+            const entryCount = Object.keys(historyData).length;
+            let perfect = 0; let totalPossible = 0; let totalDone = 0;
+            
+            Object.values(historyData).forEach(day => { 
+                if(day.allDone) perfect++; 
+                const dDone = day.habits.filter(h => h.status).length + day.prayers.filter(p => p.status).length;
+                const dPoss = day.habits.length + day.prayers.length;
+                totalDone += dDone; totalPossible += dPoss;
+            });
+            
+            const compPerc = Math.round((entryCount / 30) * 100);
+            const perfPerc = entryCount > 0 ? Math.round((perfect / entryCount) * 100) : 0;
+            const avgSuccPerc = totalPossible > 0 ? Math.round((totalDone / totalPossible) * 100) : 0;
+
+            document.getElementById('compBar').style.width = compPerc + "%";
+            document.getElementById('perfBar').style.width = perfPerc + "%";
+            document.getElementById('missBar').style.width = (entryCount > 0 ? (100 - perfPerc) : 0) + "%";
+            document.getElementById('avgSuccBar').style.width = avgSuccPerc + "%";
+
+            document.getElementById('compText').innerText = compPerc + "%";
+            document.getElementById('perfText').innerText = perfPerc + "%";
+            document.getElementById('missText').innerText = (entryCount > 0 ? (100 - perfPerc) : 0) + "%";
+            document.getElementById('avgSuccText').innerText = avgSuccPerc + "%";
+        }
+
         function renderHistory() {
             const container = document.getElementById('fullHistoryList');
             if (Object.keys(historyData).length === 0) {
-                container.innerHTML = "<p>No history found. Complete a day on the Home page!</p>";
+                container.innerHTML = "<tr><td colspan='5' style='text-align:center;'>No history yet.</td></tr>";
                 return;
             }
-
             let html = "";
             for (let i = 1; i <= 30; i++) {
                 const data = historyData[i];
-                if (!data) {
-                    html += `<div class="history-item empty">Day ${i}: No data yet</div>`;
-                    continue;
-                }
-
-                const statusClass = data.allDone ? "status-perfect" : "status-missed";
-                const statusText = data.allDone ? "PERFECT" : "MISSED";
-
-                html += `
-                    <div class="history-item">
-                        <div class="history-header">
-                            <span class="day-label">Day ${i}</span>
-                            <span class="day-status ${statusClass}">${statusText}</span>
-                        </div>
-                        <div class="history-details">
-                            <div class="detail-col">
-                                <strong>Habits:</strong>
-                                ${data.habits.map(h => `<span>${h.status ? '✅' : '❌'} ${h.name}</span>`).join('')}
-                            </div>
-                            <div class="detail-col">
-                                <strong>Prayers:</strong>
-                                ${data.prayers.map(p => `<span>${p.status ? '🕌' : '⚪'} ${p.name}</span>`).join('')}
-                            </div>
-                        </div>
-                    </div>
-                `;
+                if (!data) continue;
+                const dDone = data.habits.filter(h => h.status).length + data.prayers.filter(p => p.status).length;
+                const dTotal = data.habits.length + data.prayers.length;
+                const dPerc = Math.round((dDone / dTotal) * 100);
+                html += `<tr>
+                    <td>Day ${i}</td>
+                    <td>${dPerc}%</td>
+                    <td class="${data.allDone ? 'success-text' : 'failed-text'}"><strong>${data.allDone ? 'SUCCESS' : 'FAILED'}</strong></td>
+                    <td class="mini-icons">${data.habits.map(h => h.status ? '✅' : '❌').join('')}</td>
+                    <td class="mini-icons">${data.prayers.map(p => p.status ? '🕌' : '⚪').join('')}</td>
+                </tr>`;
             }
             container.innerHTML = html;
         }
 
-        function clearAll() {
-            if(confirm("Are you sure? This deletes everything!")) {
-                localStorage.clear();
-                window.location.href = "index.html";
-            }
-        }
-        renderHistory();
+        function clearAll() { if(confirm("Clear all data?")) { localStorage.clear(); window.location.href = "index.html"; } }
+        updateAnalytics(); renderHistory();
     </script>
 </body>
 </html>
