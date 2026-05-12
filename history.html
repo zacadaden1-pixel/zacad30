@@ -5,6 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ZACCAD 30 - HISTORY</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* Mobile Scroll Fix for the Log */
+        @media (max-width: 900px) {
+            .table-container {
+                width: 100%;
+                overflow-x: auto;
+                background: rgba(15, 23, 42, 0.3);
+                border-radius: 8px;
+            }
+            .history-table {
+                min-width: 500px; /* Ensures the prayer icons have enough space */
+            }
+            .mini-icons {
+                letter-spacing: 1px;
+                display: inline-block;
+                min-width: 80px;
+            }
+        }
+    </style>
 </head>
 <body id="mainBody">
     <nav class="navbar no-print">
@@ -78,7 +97,6 @@
             let perfect = 0; let missed = 0;
             Object.values(historyData).forEach(day => { if(day.allDone) perfect++; else missed++; });
             
-            // THEME LOGIC
             let streak = 0;
             for (let i = currentDay - 1; i >= 1; i--) {
                 if (historyData[i] && historyData[i].allDone) streak++; else break;
@@ -88,7 +106,6 @@
             if (streak >= 20) { body.classList.add('purple-theme'); badge.innerText = "LVL 3: ELITE"; badge.style.background = "#a855f7"; }
             else if (streak >= 10) { body.classList.add('gold-theme'); badge.innerText = "LVL 2: GOLD"; badge.style.background = "#fbbf24"; }
 
-            // BARS CALCULATION
             const compPerc = Math.round((entryCount / 30) * 100);
             const perfPerc = entryCount > 0 ? Math.round((perfect / entryCount) * 100) : 0;
             const missPerc = entryCount > 0 ? Math.round((missed / entryCount) * 100) : 0;
@@ -104,7 +121,7 @@
         function renderHistory() {
             const container = document.getElementById('fullHistoryList');
             if (Object.keys(historyData).length === 0) {
-                container.innerHTML = "<tr><td colspan='5' style='text-align:center;'>No entries yet.</td></tr>";
+                container.innerHTML = "<tr><td colspan='5' style='text-align:center; padding:20px;'>No entries yet.</td></tr>";
                 return;
             }
             let html = "";
