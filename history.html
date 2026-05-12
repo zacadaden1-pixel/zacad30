@@ -11,28 +11,15 @@
         <div class="logo">ZACCAD 30 <span id="levelBadge" class="level-badge">LVL 1</span></div>
         <div class="nav-links">
             <a href="index.html" class="nav-btn">🏠 Home</a>
+            <a href="tasks.html" class="nav-btn">✅ Tasks</a>
             <a href="history.html" class="nav-btn active">📊 History</a>
         </div>
     </nav>
 
     <section class="section hero-bg">
         <div class="dashboard">
-            <div class="stats-container no-print">
-                <div class="stat-box">
-                    <h4>Success ✅</h4>
-                    <div id="perfectCount" class="count success">0</div>
-                </div>
-                <div class="stat-box">
-                    <h4>Failed ❌</h4>
-                    <div id="missedCount" class="count failed">0</div>
-                </div>
-                <div class="stat-box">
-                    <h4>Current Level</h4>
-                    <div id="levelDisplay" class="count accent-text">1</div>
-                </div>
-            </div>
-
-            <div class="status-card no-print" style="margin-top: 20px; margin-bottom: 20px;">
+            
+            <div class="status-card no-print" style="margin-bottom: 20px;">
                 <h3 style="color:var(--accent); margin-bottom: 20px;">Performance Analytics</h3>
                 <div class="analytics-grid">
                     <div class="stat-item" style="margin-bottom:15px;">
@@ -62,7 +49,7 @@
             <div class="status-card">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
                     <h3>30-Day Log</h3>
-                    <button class="nav-btn no-print" onclick="window.print()" style="background:var(--success); color:#0f172a; border:none; cursor:pointer;">🖨️ Print</button>
+                    <button class="nav-btn no-print" onclick="window.print()" style="background:var(--success); color:#0f172a; border:none; cursor:pointer; font-weight:bold;">🖨️ Print</button>
                 </div>
                 <div class="table-container">
                     <table class="history-table">
@@ -92,24 +79,21 @@
             let perfect = 0; let missed = 0;
             Object.values(historyData).forEach(day => { if(day.allDone) perfect++; else missed++; });
             
+            // THEME LOGIC
             let streak = 0;
             for (let i = currentDay - 1; i >= 1; i--) {
-                if (historyData[i] && historyData[i].allDone) streak++;
-                else break;
+                if (historyData[i] && historyData[i].allDone) streak++; else break;
             }
-
             const body = document.getElementById('mainBody');
             const badge = document.getElementById('levelBadge');
-            if (streak >= 20) { body.classList.add('purple-theme'); badge.innerText = "LVL 3: ELITE"; badge.style.background = "#a855f7"; document.getElementById('levelDisplay').innerText = "3"; }
-            else if (streak >= 10) { body.classList.add('gold-theme'); badge.innerText = "LVL 2: GOLD"; badge.style.background = "#fbbf24"; document.getElementById('levelDisplay').innerText = "2"; }
-            else { document.getElementById('levelDisplay').innerText = "1"; }
+            if (streak >= 20) { body.classList.add('purple-theme'); badge.innerText = "LVL 3: ELITE"; badge.style.background = "#a855f7"; }
+            else if (streak >= 10) { body.classList.add('gold-theme'); badge.innerText = "LVL 2: GOLD"; badge.style.background = "#fbbf24"; }
 
+            // BARS CALCULATION
             const compPerc = Math.round((entryCount / 30) * 100);
             const perfPerc = entryCount > 0 ? Math.round((perfect / entryCount) * 100) : 0;
             const missPerc = entryCount > 0 ? Math.round((missed / entryCount) * 100) : 0;
 
-            document.getElementById('perfectCount').innerText = perfect;
-            document.getElementById('missedCount').innerText = missed;
             document.getElementById('compBar').style.width = compPerc + "%";
             document.getElementById('compText').innerText = compPerc + "%";
             document.getElementById('perfBar').style.width = perfPerc + "%";
@@ -120,16 +104,25 @@
 
         function renderHistory() {
             const container = document.getElementById('fullHistoryList');
-            if (Object.keys(historyData).length === 0) { container.innerHTML = "<tr><td colspan='5' style='text-align:center;'>No data.</td></tr>"; return; }
+            if (Object.keys(historyData).length === 0) {
+                container.innerHTML = "<tr><td colspan='5' style='text-align:center;'>No entries yet.</td></tr>";
+                return;
+            }
             let html = "";
             for (let i = 1; i <= 30; i++) {
                 const data = historyData[i]; if (!data) continue;
-                html += `<tr><td>Day ${i}</td><td>${data.score}%</td><td class="${data.allDone ? 'success-text' : 'failed-text'}">${data.allDone ? 'SUCCESS' : 'FAILED'}</td><td class="mini-icons">${data.habits.map(h => h.status ? '✅' : '❌').join('')}</td><td class="mini-icons">${data.prayers.map(p => p.status ? '🕌' : '⚪').join('')}</td></tr>`;
+                html += `<tr>
+                    <td>Day ${i}</td>
+                    <td>${data.score}%</td>
+                    <td class="${data.allDone ? 'success-text' : 'failed-text'}">${data.allDone ? 'SUCCESS' : 'FAILED'}</td>
+                    <td class="mini-icons">${data.habits.map(h => h.status ? '✅' : '❌').join('')}</td>
+                    <td class="mini-icons">${data.prayers.map(p => p.status ? '🕌' : '⚪').join('')}</td>
+                </tr>`;
             }
             container.innerHTML = html;
         }
 
-        function clearAll() { if(confirm("Clear data?")) { localStorage.clear(); window.location.href = "index.html"; } }
+        function clearAll() { if(confirm("Clear all progress?")) { localStorage.clear(); window.location.href = "index.html"; } }
         updateAnalytics(); renderHistory();
     </script>
 </body>
