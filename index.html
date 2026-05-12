@@ -54,7 +54,8 @@
                     </div>
 
                     <div class="status-card" style="margin-top: 20px;">
-                        <h3>Today's Progress</h3>
+                        <h3>30-Day Progress</h3>
+                        <div class="day-grid" id="trackerGrid"></div>
                         <div class="btn-group">
                             <button class="btn btn-reset" onclick="resetCheckboxes()">RESET CHECKS</button>
                             <button class="btn btn-submit" onclick="submitDay()">SUBMIT & NEXT</button>
@@ -90,6 +91,21 @@
             document.getElementById('displayCurrentDay').innerText = currentDay;
         }
 
+        function initGrid() {
+            const grid = document.getElementById('trackerGrid');
+            grid.innerHTML = '';
+            for (let i = 1; i <= 30; i++) {
+                const day = document.createElement('div');
+                day.classList.add('day-box');
+                day.innerText = i;
+                if(i === currentDay) day.classList.add('active');
+                if(historyData[i]) {
+                    day.classList.add(historyData[i].allDone ? 'success' : 'failed');
+                }
+                grid.appendChild(day);
+            }
+        }
+
         function resetCheckboxes() {
             document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
         }
@@ -117,9 +133,11 @@
             localStorage.setItem('zac_day', currentDay);
             resetCheckboxes();
             updateStats();
-            alert("Day Submitted! Check the History tab for details.");
+            initGrid();
         }
+
         updateStats();
+        initGrid();
     </script>
 </body>
 </html>
