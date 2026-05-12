@@ -49,14 +49,42 @@ body { background-color: var(--bg-main); color: var(--text-primary); overflow-x:
 .failed { color: var(--failed); }
 .accent-text { color: var(--accent); }
 
-.habit-row-group { background: rgba(15, 23, 42, 0.5); padding: 12px; border-radius: 12px; margin-bottom: 8px; border: 1px solid rgba(255,255,255,0.05); }
-.main-habit { background: transparent !important; padding: 0 !important; margin-bottom: 5px !important; }
+/* --- REFINED GYM GROUP --- */
+.habit-row-group { 
+    background: rgba(15, 23, 42, 0.5); 
+    padding: 15px; 
+    border-radius: 12px; 
+    margin-bottom: 12px; 
+    border: 1px solid rgba(255,255,255,0.05);
+}
 
-.habit-row { display: flex; align-items: center; background: rgba(15, 23, 42, 0.5); padding: 12px; border-radius: 10px; margin-bottom: 8px; cursor: pointer; }
+.main-habit { background: transparent !important; padding: 0 !important; margin-bottom: 8px !important; }
+
+.habit-row { 
+    display: flex; 
+    align-items: center; 
+    background: rgba(15, 23, 42, 0.5); 
+    padding: 12px; 
+    border-radius: 10px; 
+    margin-bottom: 8px; 
+    cursor: pointer; 
+}
+
 input[type="checkbox"] { width: 20px; height: 20px; margin-right: 12px; accent-color: var(--accent); }
 
-.rest-day-label { font-size: 0.8rem; color: var(--accent); display: flex; align-items: center; cursor: pointer; margin-left: 32px; }
-.rest-day-label input { width: 14px !important; height: 14px !important; margin-right: 8px !important; }
+/* --- PC-FRIENDLY REST BUTTON --- */
+.rest-day-label { 
+    font-size: 0.85rem; 
+    color: var(--accent); 
+    display: flex; 
+    align-items: center; 
+    cursor: pointer; 
+    margin-left: 32px; 
+    padding: 5px 0;
+    width: fit-content;
+}
+
+.rest-day-label input { width: 16px !important; height: 16px !important; margin-right: 10px !important; }
 
 .day-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(45px, 1fr)); gap: 8px; margin: 15px 0; }
 .day-box { aspect-ratio: 1; background: rgba(15, 23, 42, 0.8); border: 1px solid #334155; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; cursor: pointer; }
@@ -77,4 +105,5 @@ input[type="checkbox"] { width: 20px; height: 20px; margin-right: 12px; accent-c
     .main-layout { grid-template-columns: 1fr; }
     .hero-bg { background-attachment: scroll; background-position: 80% center; padding: 20px 15px; }
     .stats-container { flex-direction: column; }
+    .rest-day-label { margin-left: 32px; }
 }
