@@ -19,11 +19,11 @@
         <div class="dashboard">
             <div class="stats-container">
                 <div class="stat-box">
-                    <h4>Perfect Days ✅</h4>
+                    <h4>Success Days ✅</h4>
                     <div id="perfectCount" class="count success">0</div>
                 </div>
                 <div class="stat-box">
-                    <h4>Missed Days ❌</h4>
+                    <h4>Failed Days ❌</h4>
                     <div id="missedCount" class="count failed">0</div>
                 </div>
                 <div class="stat-box">
@@ -38,7 +38,7 @@
                         <h3>Daily Habits</h3>
                         <div id="habitInputs">
                             <div class="habit-row-group">
-                                <label class="habit-row main-habit">
+                                <label class="habit-row">
                                     <input type="checkbox" class="habit-check" data-name="Gym" id="gymCheck"> 
                                     <span>🏋️ Gym Workout</span>
                                 </label>
@@ -56,7 +56,7 @@
                     <div class="status-card" style="margin-top: 20px;">
                         <h3>30-Day Progress</h3>
                         <div class="day-grid" id="trackerGrid"></div>
-                        <div class="btn-group">
+                        <div class="btn-group" style="display:flex; gap:10px; margin-top:15px;">
                             <button class="btn btn-reset" onclick="resetCheckboxes()">RESET CHECKS</button>
                             <button class="btn btn-submit" onclick="submitDay()">SUBMIT & NEXT</button>
                         </div>
@@ -111,21 +111,30 @@
         }
 
         function submitDay() {
-            let dayData = { habits: [], prayers: [], allDone: true };
+            if(currentDay > 30) return alert("Challenge Complete!");
+            let dayData = { habits: [], prayers: [], allDone: false };
             const isRestDay = document.getElementById('gymRest').checked;
-            
+            let totalPossible = 0;
+            let completedCount = 0;
+
             document.querySelectorAll('.habit-check').forEach(cb => {
+                totalPossible++;
                 let status = cb.checked;
                 let name = cb.dataset.name;
                 if(name === "Gym" && isRestDay) { status = true; name = "Gym (Rest)"; }
+                if(status) completedCount++;
                 dayData.habits.push({ name: name, status: status });
-                if(!status) dayData.allDone = false;
             });
 
             document.querySelectorAll('.prayer-check').forEach(cb => {
+                totalPossible++;
+                if(cb.checked) completedCount++;
                 dayData.prayers.push({ name: cb.dataset.name, status: cb.checked });
-                if(!cb.checked) dayData.allDone = false;
             });
+
+            // 70% Logic
+            const successRate = (completedCount / totalPossible) * 100;
+            dayData.allDone = (successRate >= 70);
 
             historyData[currentDay] = dayData;
             currentDay++;
