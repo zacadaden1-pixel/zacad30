@@ -87,6 +87,23 @@
         let currentDay = parseInt(localStorage.getItem('zac_day')) || 1;
         let historyData = JSON.parse(localStorage.getItem('zac_hist')) || {};
 
+        // --- NEW: AUTO-SAVE LOGIC ---
+        function saveDraft() {
+            const draft = { habits: [], prayers: [], restDay: document.getElementById('gymRest').checked };
+            document.querySelectorAll('.habit-check').forEach(cb => draft.habits.push(cb.checked));
+            document.querySelectorAll('.prayer-check').forEach(cb => draft.prayers.push(cb.checked));
+            localStorage.setItem('zac_draft', JSON.stringify(draft));
+        }
+
+        function loadDraft() {
+            const draft = JSON.parse(localStorage.getItem('zac_draft'));
+            if (!draft) return;
+            document.getElementById('gymRest').checked = draft.restDay || false;
+            document.querySelectorAll('.habit-check').forEach((cb, i) => cb.checked = draft.habits[i] || false);
+            document.querySelectorAll('.prayer-check').forEach((cb, i) => cb.checked = draft.prayers[i] || false);
+        }
+        // ----------------------------
+
         function calculateStreak() {
             let streak = 0;
             for (let i = currentDay - 1; i >= 1; i--) {
@@ -138,7 +155,10 @@
         }
 
         function resetCheckboxes() {
-            document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+            if(confirm("Clear current inputs?")) {
+                document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+                localStorage.removeItem('zac_draft');
+            }
         }
 
         function triggerConfetti() {
@@ -146,7 +166,6 @@
             let colors = ['#06b6d4', '#22c55e'];
             if (streak >= 19) colors = ['#a855f7', '#f472b6', '#ffffff'];
             else if (streak >= 9) colors = ['#fbbf24', '#f59e0b', '#ffffff'];
-
             confetti({ particleCount: 200, spread: 80, origin: { y: 0.6 }, colors: colors });
         }
 
@@ -182,11 +201,20 @@
             currentDay++;
             localStorage.setItem('zac_hist', JSON.stringify(historyData));
             localStorage.setItem('zac_day', currentDay);
+            localStorage.removeItem('zac_draft'); // Clear draft for next day
             
-            setTimeout(() => { resetCheckboxes(); updateStats(); initGrid(); }, 500);
+            setTimeout(() => { resetCheckboxes(); updateStats(); initGrid(); location.reload(); }, 800);
         }
 
-        updateStats(); initGrid();
+        // Initialize
+        updateStats(); 
+        initGrid();
+        loadDraft();
+
+        // Listen for changes to auto-save
+        document.querySelectorAll('input[type="checkbox"]').forEach(input => {
+            input.addEventListener('change', saveDraft);
+        });
     </script>
 </body>
 </html>
