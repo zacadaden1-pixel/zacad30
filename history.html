@@ -15,12 +15,16 @@
                 border-radius: 8px;
             }
             .history-table {
-                min-width: 500px; /* Ensures the prayer icons have enough space */
+                min-width: 450px; /* Adjusted to fit content better */
             }
+            /* FIX: Mosque icons below prayer label and centered on mobile */
             .mini-icons {
-                letter-spacing: 1px;
-                display: inline-block;
-                min-width: 80px;
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 2px;
+                min-width: 60px;
+                font-size: 1.1rem;
             }
         }
     </style>
@@ -131,8 +135,8 @@
                     <td>Day ${i}</td>
                     <td>${data.score}%</td>
                     <td class="${data.allDone ? 'success-text' : 'failed-text'}">${data.allDone ? 'SUCCESS' : 'FAILED'}</td>
-                    <td class="mini-icons">${data.habits.map(h => h.status ? '✅' : '❌').join('')}</td>
-                    <td class="mini-icons">${data.prayers.map(p => p.status ? '🕌' : '⚪').join('')}</td>
+                    <td><div class="mini-icons">${data.habits.map(h => h.status ? '✅' : '❌').join('')}</div></td>
+                    <td><div class="mini-icons">${data.prayers.map(p => p.status ? '🕌' : '⚪').join('')}</div></td>
                 </tr>`;
             }
             container.innerHTML = html;
