@@ -15,6 +15,7 @@
         <div class="nav-links">
             <a href="index.html" class="nav-btn active">🏠 Home</a>
             <a href="history.html" class="nav-btn">📊 History</a>
+            <a href="forge.html" class="nav-btn">🔥 Forge</a>
         </div>
     </nav>
 
@@ -50,7 +51,11 @@
                                     <span>Mark as Rest Day</span>
                                 </label>
                             </div>
-                            <label class="habit-row"><input type="checkbox" class="habit-check" data-name="NOT G" data-weight="3"> 🚫 NOT G (3 pts)</label>
+                            <label class="habit-row" style="border: 1px solid rgba(239, 68, 68, 0.3); padding: 10px; border-radius: 8px;">
+                                <input type="checkbox" class="habit-check" data-name="NOT G" data-weight="3"> 
+                                <strong style="color: #ef4444;">🚫 NOT G (Mandatory)</strong>
+                            </label>
+                            
                             <label class="habit-row"><input type="checkbox" class="habit-check" data-name="Read 30m" data-weight="1"> 📚 Read 30 Min (1 pt)</label>
                             <label class="habit-row"><input type="checkbox" class="habit-check" data-name="1L Water" data-weight="1"> 💧 Drink 1L Water (1 pt)</label>
                             <label class="habit-row"><input type="checkbox" class="habit-check" data-name="Cold Shower" data-weight="1"> 🚿 Early Cold Shower (1 pt)</label>
@@ -87,7 +92,6 @@
         let currentDay = parseInt(localStorage.getItem('zac_day')) || 1;
         let historyData = JSON.parse(localStorage.getItem('zac_hist')) || {};
 
-        // --- NEW: AUTO-SAVE LOGIC ---
         function saveDraft() {
             const draft = { habits: [], prayers: [], restDay: document.getElementById('gymRest').checked };
             document.querySelectorAll('.habit-check').forEach(cb => draft.habits.push(cb.checked));
@@ -102,7 +106,6 @@
             document.querySelectorAll('.habit-check').forEach((cb, i) => cb.checked = draft.habits[i] || false);
             document.querySelectorAll('.prayer-check').forEach((cb, i) => cb.checked = draft.prayers[i] || false);
         }
-        // ----------------------------
 
         function calculateStreak() {
             let streak = 0;
@@ -173,14 +176,21 @@
             if(currentDay > 30) return alert("Challenge Complete!");
             let dayData = { habits: [], prayers: [], allDone: false, score: 0 };
             const isRestDay = document.getElementById('gymRest').checked;
-            let totalWeightPossible = 0; let earnedWeight = 0;
+            let totalWeightPossible = 0; 
+            let earnedWeight = 0;
+            let failedPriority = false; 
 
             document.querySelectorAll('.habit-check').forEach(cb => {
                 const weight = parseInt(cb.dataset.weight);
+                const name = cb.dataset.name;
                 totalWeightPossible += weight;
                 let status = cb.checked;
-                let name = cb.dataset.name;
-                if(name === "Gym" && isRestDay) { status = true; name = "Gym (Rest)"; }
+                
+                if(name === "Gym" && isRestDay) { status = true; }
+                
+                // PRIORITY CHECK
+                if(name === "NOT G" && !status) { failedPriority = true; }
+
                 if(status) earnedWeight += weight;
                 dayData.habits.push({ name: name, status: status });
             });
@@ -193,25 +203,29 @@
             });
 
             const successRate = (earnedWeight / totalWeightPossible) * 100;
-            dayData.allDone = (successRate >= 70);
             dayData.score = Math.round(successRate);
+
+            // PRIORITY OVERRULE: If NOT G is missed, you fail the day.
+            if (failedPriority) {
+                dayData.allDone = false; 
+            } else {
+                dayData.allDone = (successRate >= 70);
+            }
 
             if(dayData.allDone) triggerConfetti();
             historyData[currentDay] = dayData;
             currentDay++;
             localStorage.setItem('zac_hist', JSON.stringify(historyData));
             localStorage.setItem('zac_day', currentDay);
-            localStorage.removeItem('zac_draft'); // Clear draft for next day
+            localStorage.removeItem('zac_draft'); 
             
-            setTimeout(() => { resetCheckboxes(); updateStats(); initGrid(); location.reload(); }, 800);
+            setTimeout(() => { location.reload(); }, 800);
         }
 
-        // Initialize
         updateStats(); 
         initGrid();
         loadDraft();
 
-        // Listen for changes to auto-save
         document.querySelectorAll('input[type="checkbox"]').forEach(input => {
             input.addEventListener('change', saveDraft);
         });
