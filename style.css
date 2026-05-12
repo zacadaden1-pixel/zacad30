@@ -45,7 +45,7 @@ body { background-color: var(--bg-main); color: var(--text-primary); overflow-x:
 .stat-box { flex: 1; padding: 15px; border-radius: 12px; text-align: center; background: rgba(15, 23, 42, 0.7); border: 1px solid #334155; }
 .count { font-size: 1.5rem; font-weight: 800; }
 
-/* HABITS & GRID */
+/* HABITS & GRID STYLES */
 .habit-row-group { background: rgba(15, 23, 42, 0.5); padding: 10px; border-radius: 12px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.08); }
 .habit-row { display: flex; align-items: center; background: rgba(15, 23, 42, 0.5); padding: 12px; border-radius: 10px; margin-bottom: 8px; cursor: pointer; }
 input[type="checkbox"] { width: 18px; height: 18px; margin-right: 12px; accent-color: var(--accent); }
