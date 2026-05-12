@@ -3,15 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZACCAD 30 CHALLENGE</title>
+    <title>ZACCAD 30 - HOME</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <nav class="navbar"><div class="logo">ZACCAD 30 CHALLENGE</div></nav>
+    <nav class="navbar">
+        <div class="logo">ZACCAD 30 CHALLENGE</div>
+        <div class="nav-links">
+            <a href="index.html" class="nav-btn active">🏠 Home</a>
+            <a href="history.html" class="nav-btn">📊 History</a>
+        </div>
+    </nav>
 
     <section class="section hero-bg">
         <div class="dashboard">
-            
             <div class="stats-container">
                 <div class="stat-box">
                     <h4>Perfect Days ✅</h4>
@@ -42,7 +47,6 @@
                                     <span>Mark as Rest Day</span>
                                 </label>
                             </div>
-
                             <label class="habit-row"><input type="checkbox" class="habit-check" data-name="NOT G"> 🚫 NOT G</label>
                             <label class="habit-row"><input type="checkbox" class="habit-check" data-name="Read 30m"> 📚 Read (30 Min)</label>
                             <label class="habit-row"><input type="checkbox" class="habit-check" data-name="1L Water"> 💧 Drink 1L Water</label>
@@ -50,21 +54,10 @@
                     </div>
 
                     <div class="status-card" style="margin-top: 20px;">
-                        <h3>30-Day Progress</h3>
-                        <div class="day-grid" id="trackerGrid"></div>
+                        <h3>Today's Progress</h3>
                         <div class="btn-group">
                             <button class="btn btn-reset" onclick="resetCheckboxes()">RESET CHECKS</button>
                             <button class="btn btn-submit" onclick="submitDay()">SUBMIT & NEXT</button>
-                        </div>
-                        <div class="btn-group" style="margin-top: 10px;">
-                            <button class="btn btn-danger" onclick="resetAllData()">RESET ALL DATA (DAY 1)</button>
-                        </div>
-                    </div>
-
-                    <div class="status-card" style="margin-top: 20px;">
-                        <h3>History Review</h3>
-                        <div id="historyReview" class="review-panel">
-                            <p style="color:var(--text-secondary)">Click a day to see details.</p>
                         </div>
                     </div>
                 </div>
@@ -87,40 +80,18 @@
 
     <script>
         let currentDay = parseInt(localStorage.getItem('zac_day')) || 1;
-        let history = JSON.parse(localStorage.getItem('zac_hist')) || {};
+        let historyData = JSON.parse(localStorage.getItem('zac_hist')) || {};
 
         function updateStats() {
             let perfect = 0; let missed = 0;
-            Object.values(history).forEach(day => { if(day.allDone) perfect++; else missed++; });
+            Object.values(historyData).forEach(day => { if(day.allDone) perfect++; else missed++; });
             document.getElementById('perfectCount').innerText = perfect;
             document.getElementById('missedCount').innerText = missed;
             document.getElementById('displayCurrentDay').innerText = currentDay;
         }
 
-        function init() {
-            const grid = document.getElementById('trackerGrid');
-            grid.innerHTML = '';
-            for (let i = 1; i <= 30; i++) {
-                const day = document.createElement('div');
-                day.classList.add('day-box');
-                day.innerText = i;
-                if(i === currentDay) day.classList.add('active');
-                if(history[i]) day.classList.add(history[i].allDone ? 'success' : 'failed');
-                day.onclick = () => showHistory(i);
-                grid.appendChild(day);
-            }
-            updateStats();
-        }
-
         function resetCheckboxes() {
             document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
-        }
-
-        function resetAllData() {
-            if (confirm("Delete everything and start at Day 1?")) {
-                localStorage.clear();
-                location.reload();
-            }
         }
 
         function submitDay() {
@@ -140,23 +111,15 @@
                 if(!cb.checked) dayData.allDone = false;
             });
 
-            history[currentDay] = dayData;
+            historyData[currentDay] = dayData;
             currentDay++;
-            localStorage.setItem('zac_hist', JSON.stringify(history));
+            localStorage.setItem('zac_hist', JSON.stringify(historyData));
             localStorage.setItem('zac_day', currentDay);
             resetCheckboxes();
-            init();
+            updateStats();
+            alert("Day Submitted! Check the History tab for details.");
         }
-
-        function showHistory(dayNum) {
-            const review = document.getElementById('historyReview');
-            const data = history[dayNum];
-            if(!data) { review.innerHTML = `<p>No data for Day ${dayNum}.</p>`; return; }
-            let habitHtml = data.habits.map(h => `<div>${h.status ? '✅' : '❌'} ${h.name}</div>`).join('');
-            let prayerHtml = data.prayers.map(p => `<div>${p.status ? '🕌' : '⚪'} ${p.name}</div>`).join('');
-            review.innerHTML = `<div class="review-flex"><div class="review-cat"><h4>Habits</h4>${habitHtml}</div><div class="review-cat"><h4>Prayers</h4>${prayerHtml}</div></div>`;
-        }
-        init();
+        updateStats();
     </script>
 </body>
 </html>
