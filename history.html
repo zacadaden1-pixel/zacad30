@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZACCAD 30 - HISTORY</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">ZACCAD 30 CHALLENGE</div>
+        <div class="nav-links">
+            <a href="index.html" class="nav-btn">🏠 Home</a>
+            <a href="history.html" class="nav-btn active">📊 History</a>
+        </div>
+    </nav>
+
+    <section class="section hero-bg">
+        <div class="dashboard">
+            <div class="status-card">
+                <h3>30-Day Detailed History</h3>
+                <div id="fullHistoryList" class="history-list">
+                    </div>
+                <button class="btn btn-danger" style="margin-top:20px" onclick="clearAll()">RESET ENTIRE CHALLENGE</button>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        const historyData = JSON.parse(localStorage.getItem('zac_hist')) || {};
+        
+        function renderHistory() {
+            const container = document.getElementById('fullHistoryList');
+            if (Object.keys(historyData).length === 0) {
+                container.innerHTML = "<p>No history found. Complete a day on the Home page!</p>";
+                return;
+            }
+
+            let html = "";
+            for (let i = 1; i <= 30; i++) {
+                const data = historyData[i];
+                if (!data) {
+                    html += `<div class="history-item empty">Day ${i}: No data yet</div>`;
+                    continue;
+                }
+
+                const statusClass = data.allDone ? "status-perfect" : "status-missed";
+                const statusText = data.allDone ? "PERFECT" : "MISSED";
+
+                html += `
+                    <div class="history-item">
+                        <div class="history-header">
+                            <span class="day-label">Day ${i}</span>
+                            <span class="day-status ${statusClass}">${statusText}</span>
+                        </div>
+                        <div class="history-details">
+                            <div class="detail-col">
+                                <strong>Habits:</strong>
+                                ${data.habits.map(h => `<span>${h.status ? '✅' : '❌'} ${h.name}</span>`).join('')}
+                            </div>
+                            <div class="detail-col">
+                                <strong>Prayers:</strong>
+                                ${data.prayers.map(p => `<span>${p.status ? '🕌' : '⚪'} ${p.name}</span>`).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            container.innerHTML = html;
+        }
+
+        function clearAll() {
+            if(confirm("Are you sure? This deletes everything!")) {
+                localStorage.clear();
+                window.location.href = "index.html";
+            }
+        }
+        renderHistory();
+    </script>
+</body>
+</html>
