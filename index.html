@@ -15,7 +15,6 @@
         <div class="nav-links">
             <a href="index.html" class="nav-btn active">🏠 Home</a>
             <a href="history.html" class="nav-btn">📊 History</a>
-            <a href="forge.html" class="nav-btn">🔥 Forge</a>
         </div>
     </nav>
 
@@ -51,6 +50,7 @@
                                     <span>Mark as Rest Day</span>
                                 </label>
                             </div>
+                            
                             <label class="habit-row" style="border: 1px solid rgba(239, 68, 68, 0.3); padding: 10px; border-radius: 8px;">
                                 <input type="checkbox" class="habit-check" data-name="NOT G" data-weight="3"> 
                                 <strong style="color: #ef4444;">🚫 NOT G (Mandatory)</strong>
@@ -89,6 +89,7 @@
     </section>
 
     <script>
+        const PASS = "SACAD30"; // Set your password here
         let currentDay = parseInt(localStorage.getItem('zac_day')) || 1;
         let historyData = JSON.parse(localStorage.getItem('zac_hist')) || {};
 
@@ -158,9 +159,12 @@
         }
 
         function resetCheckboxes() {
-            if(confirm("Clear current inputs?")) {
+            const userPass = prompt("Enter password to reset today's progress:");
+            if(userPass === PASS) {
                 document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
                 localStorage.removeItem('zac_draft');
+            } else {
+                alert("Wrong password. Don't quit!");
             }
         }
 
@@ -187,8 +191,6 @@
                 let status = cb.checked;
                 
                 if(name === "Gym" && isRestDay) { status = true; }
-                
-                // PRIORITY CHECK
                 if(name === "NOT G" && !status) { failedPriority = true; }
 
                 if(status) earnedWeight += weight;
@@ -205,7 +207,6 @@
             const successRate = (earnedWeight / totalWeightPossible) * 100;
             dayData.score = Math.round(successRate);
 
-            // PRIORITY OVERRULE: If NOT G is missed, you fail the day.
             if (failedPriority) {
                 dayData.allDone = false; 
             } else {
