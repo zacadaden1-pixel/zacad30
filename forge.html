@@ -7,41 +7,44 @@
     <link rel="stylesheet" href="style.css">
     <style>
         .forge-card { border: 2px solid var(--accent); background: rgba(6, 182, 212, 0.05); }
-        .bonus-item { display: flex; align-items: center; justify-content: space-between; background: rgba(255, 255, 255, 0.03); padding: 15px; margin-bottom: 10px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.05); }
-        .timer-box { text-align: center; padding: 30px; background: #0f172a; border-radius: 15px; margin-top: 20px; border: 1px solid var(--accent); }
+        #bonusTasks { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 15px; }
+        .bonus-item { display: flex; align-items: center; justify-content: space-between; background: rgba(255, 255, 255, 0.03); padding: 15px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.05); }
+        .timer-box { text-align: center; padding: 30px; background: #0f172a; border-radius: 15px; margin-top: 20px; border: 1px solid var(--accent); position: relative; }
         #timerDisplay { font-size: 3.5rem; font-family: monospace; color: var(--accent); margin-bottom: 15px; font-weight: bold; }
+        .timer-input-group { margin-bottom: 20px; display: flex; justify-content: center; align-items: center; gap: 10px; }
+        .manual-input { background: #1e293b; border: 1px solid var(--accent); color: white; padding: 8px; border-radius: 6px; width: 80px; text-align: center; font-size: 1.2rem; }
 
-        /* GOLD THEME STYLES (LVL 2) */
-        .gold-mode .navbar {
-            background: linear-gradient(90deg, #1e293b 0%, #854d0e 50%, #1e293b 100%);
-            border-bottom: 2px solid #fbbf24;
-            box-shadow: 0 4px 15px rgba(251, 191, 36, 0.2);
+        /* Custom Notification Style */
+        #finishNotify {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--success);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            z-index: 1000;
+            animation: slideDown 0.5s ease;
         }
-        .gold-mode .level-badge {
-            background: #fbbf24 !important;
-            color: #000 !important;
-            box-shadow: 0 0 10px #fbbf24;
-        }
-        .gold-mode .forge-card, .gold-mode .timer-box {
-            border-color: #fbbf24;
-        }
-        .gold-mode #timerDisplay, .gold-mode h2, .gold-mode h3 {
-            color: #fbbf24 !important;
-        }
+        @keyframes slideDown { from { top: -50px; } to { top: 20px; } }
 
-        /* PURPLE THEME STYLES (LVL 3) */
-        .purple-mode .navbar {
-            background: linear-gradient(90deg, #1e293b 0%, #581c87 50%, #1e293b 100%);
-            border-bottom: 2px solid #a855f7;
-        }
-        .purple-mode .level-badge { background: #a855f7 !important; color: #fff !important; }
+        .gold-mode .navbar { background: linear-gradient(90deg, #1e293b 0%, #854d0e 50%, #1e293b 100%); border-bottom: 2px solid #fbbf24; }
+        .purple-mode .navbar { background: linear-gradient(90deg, #1e293b 0%, #581c87 50%, #1e293b 100%); border-bottom: 2px solid #a855f7; }
     </style>
 </head>
 <body id="mainBody">
+    <div id="finishNotify">🎯 SESSION COMPLETE! 🔊</div>
+
+    <audio id="finishSound" src="672d7d5d6107dfc5cb446a45f84b74dc.m4a" loop></audio>
+
     <nav class="navbar" id="topNav">
         <div class="logo-container" style="display: flex; flex-direction: column; align-items: flex-start;">
             <div class="logo" style="line-height: 1;">ZACCAD 30</div>
-            <span id="levelBadge" class="level-badge" style="margin-top: 4px; margin-left: 0; font-size: 0.65rem; padding: 2px 8px; border-radius: 4px; background: var(--accent); font-weight: 800;">LVL 1: ROOKIE</span>
+            <span id="levelBadge" class="level-badge" style="margin-top: 4px; font-size: 0.65rem; padding: 2px 8px; border-radius: 4px; background: var(--accent); font-weight: 800;">LVL 1: ROOKIE</span>
         </div>
         <div class="nav-links">
             <a href="index.html" class="nav-btn">🏠 Home</a>
@@ -54,16 +57,20 @@
         <div class="dashboard">
             <div class="status-card forge-card">
                 <h2 style="color: var(--accent);">⚡ Bonus Forge</h2>
-                <p style="color: #94a3b8; margin-bottom: 20px;">+1 point each. Use these to save a failing day.</p>
                 <div id="bonusTasks">
                     <label class="bonus-item"><span>🎤 180s Talk Topic</span><input type="checkbox" class="bonus-check" data-id="0"></label>
                     <label class="bonus-item"><span>💪 100 Pushups</span><input type="checkbox" class="bonus-check" data-id="1"></label>
                     <label class="bonus-item"><span>📻 Watch Full Broadcast</span><input type="checkbox" class="bonus-check" data-id="2"></label>
                 </div>
             </div>
+
             <div class="timer-box">
                 <h3>🎯 Focus Mode</h3>
-                <div id="timerDisplay">60:00</div>
+                <div class="timer-input-group" id="inputSection">
+                    <input type="number" id="manualMinutes" class="manual-input" value="60">
+                    <span style="color: #94a3b8;">Minutes</span>
+                </div>
+                <div id="timerDisplay">00:00</div>
                 <div class="btn-group" style="justify-content: center; gap: 10px;">
                     <button class="nav-btn" id="timerBtn" onclick="toggleTimer()">START</button>
                     <button class="nav-btn" onclick="resetTimer()">RESET</button>
@@ -73,85 +80,99 @@
     </section>
 
     <script>
-        let timeLeft = 3600; let timerId = null;
-        let historyData = JSON.parse(localStorage.getItem('zac_hist')) || {};
-        let currentDay = parseInt(localStorage.getItem('zac_day')) || 1;
+        let timerId = null;
+        let isRunning = false;
 
-        // THEME LOGIC
-        function updateForgeTheme() {
-            let streak = 0;
-            for (let i = currentDay - 1; i >= 1; i--) {
-                if (historyData[i] && historyData[i].allDone) streak++; else break;
-            }
-            const body = document.getElementById('mainBody');
-            const badge = document.getElementById('levelBadge');
-            body.classList.remove('gold-mode', 'purple-mode');
-
-            if (streak >= 20) {
-                body.classList.add('purple-mode');
-                badge.innerText = "LVL 3: ELITE";
-            } else if (streak >= 10) {
-                body.classList.add('gold-mode');
-                badge.innerText = "LVL 2: GOLD";
-            } else {
-                badge.innerText = "LVL 1: ROOKIE";
-            }
-        }
-
-        // AUTO-SAVE BONUS POINTS
-        function saveBonusState() {
-            const state = {};
-            document.querySelectorAll('.bonus-check').forEach(cb => {
-                state[cb.dataset.id] = cb.checked;
-            });
-            localStorage.setItem('zac_bonus_state', JSON.stringify(state));
-            
-            // Also update the points for the Home page to read
-            let count = document.querySelectorAll('.bonus-check:checked').length;
-            localStorage.setItem('zac_bonus_points', count);
-        }
-
-        function loadBonusState() {
-            const state = JSON.parse(localStorage.getItem('zac_bonus_state'));
-            if (state) {
-                document.querySelectorAll('.bonus-check').forEach(cb => {
-                    if (state[cb.dataset.id] !== undefined) {
-                        cb.checked = state[cb.dataset.id];
-                    }
-                });
-            }
-        }
-
-        document.querySelectorAll('.bonus-check').forEach(cb => {
-            cb.addEventListener('change', saveBonusState);
-        });
-
-        // TIMER LOGIC
-        function toggleTimer() {
-            if (timerId) { clearInterval(timerId); timerId = null; document.getElementById('timerBtn').innerText = "RESUME"; }
-            else {
-                timerId = setInterval(() => {
-                    timeLeft--; updateTimerDisplay();
-                    if (timeLeft <= 0) { 
-                        clearInterval(timerId); 
-                        alert("Focus Done! +1 Bonus earned."); 
-                        // Logic for automatic bonus point could go here
-                    }
-                }, 1000);
-                document.getElementById('timerBtn').innerText = "PAUSE";
-            }
-        }
-
-        function updateTimerDisplay() {
-            let m = Math.floor(timeLeft / 60); let s = timeLeft % 60;
+        function updateTimerDisplay(seconds) {
+            let m = Math.floor(seconds / 60); 
+            let s = seconds % 60;
             document.getElementById('timerDisplay').innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
         }
 
-        function resetTimer() { clearInterval(timerId); timerId = null; timeLeft = 3600; updateTimerDisplay(); document.getElementById('timerBtn').innerText = "START"; }
+        function toggleTimer() {
+            const finishAudio = document.getElementById('finishSound');
+            const timerBtn = document.getElementById('timerBtn');
+            const notify = document.getElementById('finishNotify');
 
-        // Initial Load
-        loadBonusState();
-        updateForgeTheme();
+            if (!isRunning) {
+                let endTime = localStorage.getItem('zac_timer_end');
+                
+                if (!endTime) {
+                    const mins = parseInt(document.getElementById('manualMinutes').value) || 0;
+                    if (mins <= 0) return;
+                    endTime = Date.now() + (mins * 60 * 1000);
+                    localStorage.setItem('zac_timer_end', endTime);
+                }
+
+                document.getElementById('inputSection').style.display = 'none';
+                timerBtn.innerText = "RUNNING...";
+                isRunning = true;
+
+                timerId = setInterval(() => {
+                    const now = Date.now();
+                    const remaining = Math.round((endTime - now) / 1000);
+
+                    if (remaining <= 0) {
+                        clearInterval(timerId);
+                        updateTimerDisplay(0);
+                        localStorage.removeItem('zac_timer_end');
+                        
+                        // Start music immediately (No alert blocking it)
+                        finishAudio.play().catch(e => console.log("Audio play failed: ", e));
+                        notify.style.display = 'block';
+                        
+                        timerBtn.innerText = "DONE!";
+                        isRunning = false;
+                    } else {
+                        updateTimerDisplay(remaining);
+                    }
+                }, 1000);
+            }
+        }
+
+        function resetTimer() {
+            clearInterval(timerId);
+            localStorage.removeItem('zac_timer_end');
+            isRunning = false;
+            
+            // Stop music and hide notification
+            const audio = document.getElementById('finishSound');
+            audio.pause();
+            audio.currentTime = 0;
+            document.getElementById('finishNotify').style.display = 'none';
+
+            document.getElementById('timerDisplay').innerText = "00:00";
+            document.getElementById('timerBtn').innerText = "START";
+            document.getElementById('inputSection').style.display = 'flex';
+        }
+
+        function checkExistingTimer() {
+            const endTime = localStorage.getItem('zac_timer_end');
+            if (endTime) {
+                const remaining = Math.round((endTime - Date.now()) / 1000);
+                if (remaining > 0) {
+                    toggleTimer();
+                } else {
+                    localStorage.removeItem('zac_timer_end');
+                }
+            }
+        }
+
+        function saveBonus() {
+            const state = {};
+            document.querySelectorAll('.bonus-check').forEach(cb => { state[cb.dataset.id] = cb.checked; });
+            localStorage.setItem('zac_bonus_state', JSON.stringify(state));
+            localStorage.setItem('zac_bonus_points', document.querySelectorAll('.bonus-check:checked').length);
+        }
+
+        window.onload = () => {
+            const state = JSON.parse(localStorage.getItem('zac_bonus_state'));
+            document.querySelectorAll('.bonus-check').forEach(cb => {
+                if (state?.[cb.dataset.id]) cb.checked = true;
+                cb.addEventListener('change', saveBonus);
+            });
+            checkExistingTimer();
+        };
     </script>
 </body>
 </html>
