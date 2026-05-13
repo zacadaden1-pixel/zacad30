@@ -6,34 +6,102 @@
     <title>ZACCAD 30 - FORGE</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        .forge-card { border: 2px solid var(--accent); background: rgba(6, 182, 212, 0.05); }
-        #bonusTasks { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 15px; }
-        .bonus-item { display: flex; align-items: center; justify-content: space-between; background: rgba(255, 255, 255, 0.03); padding: 15px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.05); }
-        .timer-box { text-align: center; padding: 30px; background: #0f172a; border-radius: 15px; margin-top: 20px; border: 1px solid var(--accent); position: relative; }
-        #timerDisplay { font-size: 3.5rem; font-family: monospace; color: var(--accent); margin-bottom: 15px; font-weight: bold; }
-        .timer-input-group { margin-bottom: 20px; display: flex; justify-content: center; align-items: center; gap: 10px; }
-        .manual-input { background: #1e293b; border: 1px solid var(--accent); color: white; padding: 8px; border-radius: 6px; width: 80px; text-align: center; font-size: 1.2rem; }
+        /* Professional Focus Mode Styling */
+        .forge-card { 
+            border: 2px solid var(--accent); 
+            background: rgba(6, 182, 212, 0.05); 
+            transition: all 0.3s ease;
+        }
+        
+        #bonusTasks { display: grid; grid-template-columns: 1fr; gap: 12px; margin-top: 15px; }
+        
+        .bonus-item { 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            background: rgba(255, 255, 255, 0.03); 
+            padding: 16px; 
+            border-radius: 12px; 
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: transform 0.2s;
+        }
+        .bonus-item:hover { transform: translateY(-2px); background: rgba(255, 255, 255, 0.05); }
 
-        /* Custom Notification Style */
+        .timer-box { 
+            text-align: center; 
+            padding: 40px 20px; 
+            background: #0f172a; 
+            border-radius: 20px; 
+            margin-top: 25px; 
+            border: 1px solid var(--accent); 
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        #timerDisplay { 
+            font-size: 4.5rem; 
+            font-family: 'Courier New', monospace; 
+            color: var(--accent); 
+            margin-bottom: 20px; 
+            font-weight: 800;
+            letter-spacing: -2px;
+            text-shadow: 0 0 20px rgba(6, 182, 212, 0.3);
+        }
+        
+        .timer-input-group { 
+            margin-bottom: 25px; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            gap: 12px; 
+            background: rgba(255,255,255,0.03);
+            padding: 10px;
+            border-radius: 10px;
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .manual-input { 
+            background: #1e293b; 
+            border: 2px solid var(--accent); 
+            color: white; 
+            padding: 10px; 
+            border-radius: 8px; 
+            width: 90px; 
+            text-align: center; 
+            font-size: 1.4rem;
+            font-weight: bold;
+        }
+
         #finishNotify {
             display: none;
             position: fixed;
-            top: 20px;
+            top: 25px;
             left: 50%;
             transform: translateX(-50%);
-            background: var(--success);
+            background: #10b981;
             color: white;
-            padding: 15px 30px;
-            border-radius: 50px;
-            font-weight: bold;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            padding: 18px 40px;
+            border-radius: 12px;
+            font-weight: 900;
+            box-shadow: 0 10px 40px rgba(16, 185, 129, 0.4);
             z-index: 1000;
-            animation: slideDown 0.5s ease;
+            animation: slideDown 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.28);
         }
-        @keyframes slideDown { from { top: -50px; } to { top: 20px; } }
 
+        @keyframes slideDown { from { top: -100px; opacity: 0; } to { top: 25px; opacity: 1; } }
+
+        /* THEME OVERRIDES (STREAK COLORS) */
         .gold-mode .navbar { background: linear-gradient(90deg, #1e293b 0%, #854d0e 50%, #1e293b 100%); border-bottom: 2px solid #fbbf24; }
+        .gold-mode .level-badge { background: #fbbf24 !important; color: #000 !important; }
+        .gold-mode .timer-box, .gold-mode .manual-input, .gold-mode .forge-card { border-color: #fbbf24; }
+        .gold-mode #timerDisplay { color: #fbbf24; text-shadow: 0 0 20px rgba(251, 191, 36, 0.3); }
+
         .purple-mode .navbar { background: linear-gradient(90deg, #1e293b 0%, #581c87 50%, #1e293b 100%); border-bottom: 2px solid #a855f7; }
+        .purple-mode .level-badge { background: #a855f7 !important; color: #fff !important; }
+        .purple-mode .timer-box, .purple-mode .manual-input, .purple-mode .forge-card { border-color: #a855f7; }
+        .purple-mode #timerDisplay { color: #a855f7; text-shadow: 0 0 20px rgba(168, 85, 247, 0.3); }
     </style>
 </head>
 <body id="mainBody">
@@ -65,15 +133,15 @@
             </div>
 
             <div class="timer-box">
-                <h3>🎯 Focus Mode</h3>
+                <h3 style="margin-bottom: 20px; text-transform: uppercase; letter-spacing: 2px;">🎯 Focus Mode</h3>
                 <div class="timer-input-group" id="inputSection">
                     <input type="number" id="manualMinutes" class="manual-input" value="60">
-                    <span style="color: #94a3b8;">Minutes</span>
+                    <span style="color: #94a3b8; font-weight: bold;">MINS</span>
                 </div>
                 <div id="timerDisplay">00:00</div>
-                <div class="btn-group" style="justify-content: center; gap: 10px;">
-                    <button class="nav-btn" id="timerBtn" onclick="toggleTimer()">START</button>
-                    <button class="nav-btn" onclick="resetTimer()">RESET</button>
+                <div class="btn-group" style="justify-content: center; gap: 15px;">
+                    <button class="nav-btn" id="timerBtn" onclick="toggleTimer()" style="min-width: 120px;">START</button>
+                    <button class="nav-btn" onclick="resetTimer()" style="opacity: 0.7;">RESET</button>
                 </div>
             </div>
         </div>
@@ -82,6 +150,30 @@
     <script>
         let timerId = null;
         let isRunning = false;
+        let historyData = JSON.parse(localStorage.getItem('zac_hist')) || {};
+        let currentDay = parseInt(localStorage.getItem('zac_day')) || 1;
+
+        function updateTheme() {
+            let streak = 0;
+            // Calculate streak exactly like Home/History
+            for (let i = currentDay - 1; i >= 1; i--) {
+                if (historyData[i] && historyData[i].allDone) streak++; else break;
+            }
+            
+            const body = document.getElementById('mainBody');
+            const badge = document.getElementById('levelBadge');
+            
+            body.classList.remove('gold-mode', 'purple-mode');
+            if (streak >= 20) {
+                body.classList.add('purple-mode');
+                badge.innerText = "LVL 3: ELITE";
+            } else if (streak >= 10) {
+                body.classList.add('gold-mode');
+                badge.innerText = "LVL 2: GOLD";
+            } else {
+                badge.innerText = "LVL 1: ROOKIE";
+            }
+        }
 
         function updateTimerDisplay(seconds) {
             let m = Math.floor(seconds / 60); 
@@ -96,7 +188,6 @@
 
             if (!isRunning) {
                 let endTime = localStorage.getItem('zac_timer_end');
-                
                 if (!endTime) {
                     const mins = parseInt(document.getElementById('manualMinutes').value) || 0;
                     if (mins <= 0) return;
@@ -104,7 +195,7 @@
                     localStorage.setItem('zac_timer_end', endTime);
                 }
 
-                document.getElementById('inputSection').style.display = 'none';
+                document.getElementById('inputSection').style.visibility = 'hidden';
                 timerBtn.innerText = "RUNNING...";
                 isRunning = true;
 
@@ -116,12 +207,9 @@
                         clearInterval(timerId);
                         updateTimerDisplay(0);
                         localStorage.removeItem('zac_timer_end');
-                        
-                        // Start music immediately (No alert blocking it)
-                        finishAudio.play().catch(e => console.log("Audio play failed: ", e));
+                        finishAudio.play().catch(e => console.log(e));
                         notify.style.display = 'block';
-                        
-                        timerBtn.innerText = "DONE!";
+                        timerBtn.innerText = "COMPLETED";
                         isRunning = false;
                     } else {
                         updateTimerDisplay(remaining);
@@ -134,27 +222,21 @@
             clearInterval(timerId);
             localStorage.removeItem('zac_timer_end');
             isRunning = false;
-            
-            // Stop music and hide notification
             const audio = document.getElementById('finishSound');
             audio.pause();
             audio.currentTime = 0;
             document.getElementById('finishNotify').style.display = 'none';
-
             document.getElementById('timerDisplay').innerText = "00:00";
             document.getElementById('timerBtn').innerText = "START";
-            document.getElementById('inputSection').style.display = 'flex';
+            document.getElementById('inputSection').style.visibility = 'visible';
         }
 
         function checkExistingTimer() {
             const endTime = localStorage.getItem('zac_timer_end');
             if (endTime) {
                 const remaining = Math.round((endTime - Date.now()) / 1000);
-                if (remaining > 0) {
-                    toggleTimer();
-                } else {
-                    localStorage.removeItem('zac_timer_end');
-                }
+                if (remaining > 0) toggleTimer();
+                else localStorage.removeItem('zac_timer_end');
             }
         }
 
@@ -171,6 +253,7 @@
                 if (state?.[cb.dataset.id]) cb.checked = true;
                 cb.addEventListener('change', saveBonus);
             });
+            updateTheme();
             checkExistingTimer();
         };
     </script>
