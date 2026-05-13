@@ -56,9 +56,9 @@
                 <h2 style="color: var(--accent);">⚡ Bonus Forge</h2>
                 <p style="color: #94a3b8; margin-bottom: 20px;">+1 point each. Use these to save a failing day.</p>
                 <div id="bonusTasks">
-                    <label class="bonus-item"><span>🎤 180s Talk Topic</span><input type="checkbox" class="bonus-check"></label>
-                    <label class="bonus-item"><span>💪 100 Pushups</span><input type="checkbox" class="bonus-check"></label>
-                    <label class="bonus-item"><span>📻 Watch Full Broadcast</span><input type="checkbox" class="bonus-check"></label>
+                    <label class="bonus-item"><span>🎤 180s Talk Topic</span><input type="checkbox" class="bonus-check" data-id="0"></label>
+                    <label class="bonus-item"><span>💪 100 Pushups</span><input type="checkbox" class="bonus-check" data-id="1"></label>
+                    <label class="bonus-item"><span>📻 Watch Full Broadcast</span><input type="checkbox" class="bonus-check" data-id="2"></label>
                 </div>
             </div>
             <div class="timer-box">
@@ -77,13 +77,12 @@
         let historyData = JSON.parse(localStorage.getItem('zac_hist')) || {};
         let currentDay = parseInt(localStorage.getItem('zac_day')) || 1;
 
-        // CALCULATE STREAK TO SET THEME
+        // THEME LOGIC
         function updateForgeTheme() {
             let streak = 0;
             for (let i = currentDay - 1; i >= 1; i--) {
                 if (historyData[i] && historyData[i].allDone) streak++; else break;
             }
-
             const body = document.getElementById('mainBody');
             const badge = document.getElementById('levelBadge');
             body.classList.remove('gold-mode', 'purple-mode');
@@ -99,19 +98,45 @@
             }
         }
 
-        document.querySelectorAll('.bonus-check').forEach(cb => {
-            cb.addEventListener('change', () => {
-                let count = document.querySelectorAll('.bonus-check:checked').length;
-                localStorage.setItem('zac_bonus_points', count);
+        // AUTO-SAVE BONUS POINTS
+        function saveBonusState() {
+            const state = {};
+            document.querySelectorAll('.bonus-check').forEach(cb => {
+                state[cb.dataset.id] = cb.checked;
             });
+            localStorage.setItem('zac_bonus_state', JSON.stringify(state));
+            
+            // Also update the points for the Home page to read
+            let count = document.querySelectorAll('.bonus-check:checked').length;
+            localStorage.setItem('zac_bonus_points', count);
+        }
+
+        function loadBonusState() {
+            const state = JSON.parse(localStorage.getItem('zac_bonus_state'));
+            if (state) {
+                document.querySelectorAll('.bonus-check').forEach(cb => {
+                    if (state[cb.dataset.id] !== undefined) {
+                        cb.checked = state[cb.dataset.id];
+                    }
+                });
+            }
+        }
+
+        document.querySelectorAll('.bonus-check').forEach(cb => {
+            cb.addEventListener('change', saveBonusState);
         });
 
+        // TIMER LOGIC
         function toggleTimer() {
             if (timerId) { clearInterval(timerId); timerId = null; document.getElementById('timerBtn').innerText = "RESUME"; }
             else {
                 timerId = setInterval(() => {
                     timeLeft--; updateTimerDisplay();
-                    if (timeLeft <= 0) { clearInterval(timerId); alert("Focus Done! +1 Bonus earned."); }
+                    if (timeLeft <= 0) { 
+                        clearInterval(timerId); 
+                        alert("Focus Done! +1 Bonus earned."); 
+                        // Logic for automatic bonus point could go here
+                    }
                 }, 1000);
                 document.getElementById('timerBtn').innerText = "PAUSE";
             }
@@ -124,7 +149,8 @@
 
         function resetTimer() { clearInterval(timerId); timerId = null; timeLeft = 3600; updateTimerDisplay(); document.getElementById('timerBtn').innerText = "START"; }
 
-        // Initial Theme Load
+        // Initial Load
+        loadBonusState();
         updateForgeTheme();
     </script>
 </body>
