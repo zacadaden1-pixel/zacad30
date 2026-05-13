@@ -5,29 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ZACCAD 30 - HISTORY</title>
     <link rel="stylesheet" href="style.css">
-    <style>
-        /* Mobile Scroll Fix for the Log */
-        @media (max-width: 900px) {
-            .table-container {
-                width: 100%;
-                overflow-x: auto;
-                background: rgba(15, 23, 42, 0.3);
-                border-radius: 8px;
-            }
-            .history-table {
-                min-width: 450px; /* Adjusted to fit content better */
-            }
-            /* FIX: Mosque icons below prayer label and centered on mobile */
-            .mini-icons {
-                display: flex;
-                flex-wrap: wrap;
-                justify-content: center;
-                gap: 2px;
-                min-width: 60px;
-                font-size: 1.1rem;
-            }
-        }
-    </style>
 </head>
 <body id="mainBody">
     <nav class="navbar no-print">
@@ -40,7 +17,6 @@
 
     <section class="section hero-bg">
         <div class="dashboard">
-            
             <div class="status-card no-print" style="margin-bottom: 20px;">
                 <h3 style="color:var(--accent); margin-bottom: 20px;">Performance Analytics</h3>
                 <div class="analytics-grid">
@@ -58,21 +34,11 @@
                         </div>
                         <div class="progress-bar-bg"><div id="perfBar" class="progress-fill success-bg"></div></div>
                     </div>
-                    <div class="stat-item">
-                        <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                            <span>Miss Rate (Failures)</span>
-                            <span id="missText">0%</span>
-                        </div>
-                        <div class="progress-bar-bg"><div id="missBar" class="progress-fill failed-bg"></div></div>
-                    </div>
                 </div>
             </div>
 
             <div class="status-card">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                    <h3>30-Day Log</h3>
-                    <button class="nav-btn no-print" onclick="window.print()" style="background:var(--success); color:#0f172a; border:none; cursor:pointer; font-weight:bold;">🖨️ Print</button>
-                </div>
+                <h3>30-Day Log</h3>
                 <div class="table-container">
                     <table class="history-table">
                         <thead>
@@ -87,19 +53,20 @@
                         <tbody id="fullHistoryList"></tbody>
                     </table>
                 </div>
-                <button class="btn btn-danger no-print" style="margin-top:20px" onclick="clearAll()">RESET DATA</button>
+                <button class="btn btn-danger no-print" style="margin-top:20px" onclick="clearAll()">RESET CHALLENGE DATA</button>
             </div>
         </div>
     </section>
 
     <script>
+        const PASS = "SACAD30"; // Set your password here
         const historyData = JSON.parse(localStorage.getItem('zac_hist')) || {};
         const currentDay = parseInt(localStorage.getItem('zac_day')) || 1;
         
         function updateAnalytics() {
             const entryCount = Object.keys(historyData).length;
-            let perfect = 0; let missed = 0;
-            Object.values(historyData).forEach(day => { if(day.allDone) perfect++; else missed++; });
+            let perfect = 0;
+            Object.values(historyData).forEach(day => { if(day.allDone) perfect++; });
             
             let streak = 0;
             for (let i = currentDay - 1; i >= 1; i--) {
@@ -112,22 +79,15 @@
 
             const compPerc = Math.round((entryCount / 30) * 100);
             const perfPerc = entryCount > 0 ? Math.round((perfect / entryCount) * 100) : 0;
-            const missPerc = entryCount > 0 ? Math.round((missed / entryCount) * 100) : 0;
 
             document.getElementById('compBar').style.width = compPerc + "%";
             document.getElementById('compText').innerText = compPerc + "%";
             document.getElementById('perfBar').style.width = perfPerc + "%";
             document.getElementById('perfText').innerText = perfPerc + "%";
-            document.getElementById('missBar').style.width = missPerc + "%";
-            document.getElementById('missText').innerText = missPerc + "%";
         }
 
         function renderHistory() {
             const container = document.getElementById('fullHistoryList');
-            if (Object.keys(historyData).length === 0) {
-                container.innerHTML = "<tr><td colspan='5' style='text-align:center; padding:20px;'>No entries yet.</td></tr>";
-                return;
-            }
             let html = "";
             for (let i = 1; i <= 30; i++) {
                 const data = historyData[i]; if (!data) continue;
@@ -135,14 +95,24 @@
                     <td>Day ${i}</td>
                     <td>${data.score}%</td>
                     <td class="${data.allDone ? 'success-text' : 'failed-text'}">${data.allDone ? 'SUCCESS' : 'FAILED'}</td>
-                    <td><div class="mini-icons">${data.habits.map(h => h.status ? '✅' : '❌').join('')}</div></td>
-                    <td><div class="mini-icons">${data.prayers.map(p => p.status ? '🕌' : '⚪').join('')}</div></td>
+                    <td>${data.habits.map(h => h.status ? '✅' : '❌').join('')}</td>
+                    <td>${data.prayers.map(p => p.status ? '🕌' : '⚪').join('')}</td>
                 </tr>`;
             }
-            container.innerHTML = html;
+            container.innerHTML = html || "<tr><td colspan='5'>No data yet.</td></tr>";
         }
 
-        function clearAll() { if(confirm("Clear all progress?")) { localStorage.clear(); window.location.href = "index.html"; } }
+        function clearAll() { 
+            const userPass = prompt("Enter password to DELETE ALL progress:");
+            if(userPass === PASS) {
+                if(confirm("Confirm hard reset?")) {
+                    localStorage.clear(); 
+                    window.location.href = "index.html";
+                }
+            } else {
+                alert("Wrong password. Stay in the fight!");
+            }
+        }
         updateAnalytics(); renderHistory();
     </script>
 </body>
