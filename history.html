@@ -6,62 +6,51 @@
     <title>ZACCAD 30 - HISTORY</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        .table-container {
-            width: 100%;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            background: rgba(15, 23, 42, 0.2);
-            border-radius: 12px;
-            margin-top: 10px;
+        .analytics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .stat-label-row { display: flex; justify-content: space-between; font-size: 0.7rem; font-weight: bold; }
+        .table-container { width: 100%; overflow-x: auto; background: rgba(15, 23, 42, 0.2); border-radius: 12px; margin-top: 10px; }
+        .history-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; min-width: 500px; }
+        .history-table th, .history-table td { padding: 10px 5px; text-align: center; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+        .mini-icons { display: flex; justify-content: center; gap: 2px; font-size: 0.9rem; }
+        .priority-fail { font-size: 0.65rem; display: block; color: #ff4444; font-weight: bold; }
+        
+        /* GOLD THEME STYLES (LVL 2) */
+        .gold-mode .navbar {
+            background: linear-gradient(90deg, #1e293b 0%, #854d0e 50%, #1e293b 100%);
+            border-bottom: 2px solid #fbbf24;
+            box-shadow: 0 4px 15px rgba(251, 191, 36, 0.2);
         }
-
-        .history-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.85rem;
-            min-width: 500px;
+        .gold-mode .level-badge {
+            background: #fbbf24 !important;
+            color: #000 !important;
+            box-shadow: 0 0 10px #fbbf24;
         }
+        .gold-mode h3 { color: #fbbf24 !important; }
+        .gold-mode .progress-fill.accent-bg { background: #fbbf24 !important; }
 
-        .history-table th, .history-table td {
-            padding: 10px 5px;
-            text-align: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        /* PURPLE THEME STYLES (LVL 3) */
+        .purple-mode .navbar {
+            background: linear-gradient(90deg, #1e293b 0%, #581c87 50%, #1e293b 100%);
+            border-bottom: 2px solid #a855f7;
         }
+        .purple-mode .level-badge { background: #a855f7 !important; color: #fff !important; }
 
-        .analytics-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-            gap: 15px;
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white !important; color: black !important; }
+            .status-card { border: 1px solid #ccc !important; box-shadow: none !important; }
         }
-
-        .mini-icons {
-            display: flex;
-            justify-content: center;
-            gap: 2px;
-            font-size: 0.9rem;
-        }
-
-        .priority-fail {
-            font-size: 0.7rem;
-            display: block;
-            color: #ff4444;
-            margin-top: 2px;
-        }
-
-        @media (max-width: 600px) {
-            .dashboard { padding: 10px; }
-            .status-card { padding: 15px; }
-        }
-
-        .success-text { color: var(--success); font-weight: bold; }
-        .failed-text { color: var(--failed); font-weight: bold; }
     </style>
 </head>
 <body id="mainBody">
-    <nav class="navbar no-print">
-        <div class="logo">ZACCAD 30 <span id="levelBadge" class="level-badge">LVL 1</span></div>
+    <nav class="navbar no-print" id="topNav">
+        <div class="logo-container" style="display: flex; flex-direction: column; align-items: flex-start;">
+            <div class="logo" style="line-height: 1;">ZACCAD 30</div>
+            <span id="levelBadge" class="level-badge" style="margin-top: 4px; margin-left: 0; font-size: 0.65rem; padding: 2px 8px; border-radius: 4px; background: var(--accent); font-weight: 800;">LVL 1: ROOKIE</span>
+        </div>
         <div class="nav-links">
             <a href="index.html" class="nav-btn">🏠 Home</a>
+            <a href="forge.html" class="nav-btn">⚡ Forge</a>
             <a href="history.html" class="nav-btn active">📊 History</a>
         </div>
     </nav>
@@ -71,125 +60,96 @@
             <div class="status-card no-print" style="margin-bottom: 20px;">
                 <h3 style="color:var(--accent); margin-bottom: 15px;">Live Analytics</h3>
                 <div class="analytics-grid">
-                    <div class="stat-item">
-                        <div style="display:flex; justify-content:space-between; margin-bottom:5px; font-size: 0.75rem;">
-                            <span>Completion</span>
-                            <span id="compText">0%</span>
-                        </div>
-                        <div class="progress-bar-bg"><div id="compBar" class="progress-fill accent-bg" style="width: 0%"></div></div>
-                    </div>
-                    <div class="stat-item">
-                        <div style="display:flex; justify-content:space-between; margin-bottom:5px; font-size: 0.75rem;">
-                            <span>Success</span>
-                            <span id="perfText">0%</span>
-                        </div>
-                        <div class="progress-bar-bg"><div id="perfBar" class="progress-fill success-bg" style="width: 0%"></div></div>
-                    </div>
-                    <div class="stat-item">
-                        <div style="display:flex; justify-content:space-between; margin-bottom:5px; font-size: 0.75rem;">
-                            <span>Miss Rate</span>
-                            <span id="missText">0%</span>
-                        </div>
-                        <div class="progress-bar-bg"><div id="missBar" class="progress-fill failed-bg" style="width: 0%"></div></div>
-                    </div>
+                    <div class="stat-item"><div class="stat-label-row"><span>COMP</span><span id="compText">0%</span></div><div class="progress-bar-bg"><div id="compBar" class="progress-fill accent-bg" style="width: 0%"></div></div></div>
+                    <div class="stat-item"><div class="stat-label-row"><span style="color: var(--success);">WIN</span><span id="perfText" style="color: var(--success);">0%</span></div><div class="progress-bar-bg"><div id="perfBar" class="progress-fill success-bg" style="width: 0%"></div></div></div>
+                    <div class="stat-item"><div class="stat-label-row"><span style="color: var(--failed);">MISS</span><span id="missText" style="color: var(--failed);">0%</span></div><div class="progress-bar-bg"><div id="missBar" class="progress-fill failed-bg" style="width: 0%"></div></div></div>
                 </div>
             </div>
 
             <div class="status-card">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
                     <h3>Log History</h3>
-                    <span id="dayCounter" style="font-size: 0.75rem; color: var(--accent);"></span>
+                    <div class="no-print" style="display:flex; gap:5px;">
+                        <button onclick="window.print()" class="nav-btn" style="font-size:0.7rem; padding:5px 10px;">🖨️ Print</button>
+                        <button onclick="copyToClipboard()" class="nav-btn" style="font-size:0.7rem; padding:5px 10px;">📋 Copy</button>
+                    </div>
                 </div>
                 
                 <div class="table-container">
                     <table class="history-table">
-                        <thead>
-                            <tr>
-                                <th>Day</th>
-                                <th>Score</th>
-                                <th>Result</th>
-                                <th>Habits</th>
-                                <th>Prayers</th>
-                            </tr>
-                        </thead>
+                        <thead><tr><th>Day</th><th>Score</th><th>Result</th><th>Habits</th><th>Prayers</th></tr></thead>
                         <tbody id="fullHistoryList"></tbody>
                     </table>
                 </div>
 
-                <div style="margin-top: 25px;">
-                    <button class="btn btn-danger no-print" style="width: 100%; max-width: 280px; margin: 10px auto; display: block; font-size: 0.8rem;" onclick="clearAll()">RESET CHALLENGE</button>
+                <div class="no-print" style="margin-top: 25px;">
+                    <button class="btn btn-danger" style="width: 100%; max-width: 280px; margin: 10px auto; display: block;" onclick="clearAll()">RESET CHALLENGE</button>
                 </div>
             </div>
         </div>
     </section>
 
     <script>
-        const PASS = "SACAD30"; 
         const historyData = JSON.parse(localStorage.getItem('zac_hist')) || {};
         const currentDay = parseInt(localStorage.getItem('zac_day')) || 1;
         
-        function updateAnalytics() {
-            const entryCount = Object.keys(historyData).length;
-            let perfect = 0;
-            let missed = 0;
-            Object.values(historyData).forEach(day => { if(day.allDone) perfect++; else missed++; });
-            
+        function updateTheme() {
             let streak = 0;
             for (let i = currentDay - 1; i >= 1; i--) {
                 if (historyData[i] && historyData[i].allDone) streak++; else break;
             }
-
             const body = document.getElementById('mainBody');
             const badge = document.getElementById('levelBadge');
-            if (streak >= 20) { body.classList.add('purple-theme'); badge.innerText = "LVL 3: ELITE"; badge.style.background = "#a855f7"; }
-            else if (streak >= 10) { body.classList.add('gold-theme'); badge.innerText = "LVL 2: GOLD"; badge.style.background = "#fbbf24"; }
+            body.classList.remove('gold-mode', 'purple-mode');
+            if (streak >= 20) { body.classList.add('purple-mode'); badge.innerText = "LVL 3: ELITE"; }
+            else if (streak >= 10) { body.classList.add('gold-mode'); badge.innerText = "LVL 2: GOLD"; }
+            else { badge.innerText = "LVL 1: ROOKIE"; }
+        }
 
+        function updateAnalytics() {
+            const entries = Object.values(historyData);
+            const entryCount = entries.length;
+            let perfect = 0; let missed = 0;
+            entries.forEach(day => { if(day.allDone) perfect++; else missed++; });
             const compPerc = Math.round((entryCount / 30) * 100);
             const perfPerc = entryCount > 0 ? Math.round((perfect / entryCount) * 100) : 0;
             const missPerc = entryCount > 0 ? Math.round((missed / entryCount) * 100) : 0;
-
             document.getElementById('compBar').style.width = compPerc + "%";
             document.getElementById('compText').innerText = compPerc + "%";
             document.getElementById('perfBar').style.width = perfPerc + "%";
             document.getElementById('perfText').innerText = perfPerc + "%";
             document.getElementById('missBar').style.width = missPerc + "%";
             document.getElementById('missText').innerText = missPerc + "%";
-            document.getElementById('dayCounter').innerText = `${entryCount}/30 Days`;
         }
 
         function renderHistory() {
             const container = document.getElementById('fullHistoryList');
             let html = "";
             for (let i = 1; i <= 30; i++) {
-                const data = historyData[i]; 
-                if (!data) continue;
-
-                // CHECK FOR PRIORITY FAIL
+                const data = historyData[i]; if (!data) continue;
                 let resultText = data.allDone ? 'PASS' : 'FAIL';
                 const notG = data.habits.find(h => h.name === "NOT G");
-                if (!data.allDone && notG && !notG.status) {
-                    resultText = 'FAIL <span class="priority-fail">PRIORITY</span>';
-                }
-
-                html += `<tr>
-                    <td>D${i}</td>
-                    <td style="font-family: monospace;">${data.score}%</td>
-                    <td class="${data.allDone ? 'success-text' : 'failed-text'}">${resultText}</td>
-                    <td><div class="mini-icons">${data.habits.map(h => h.status ? '●' : '○').join('')}</div></td>
-                    <td><div class="mini-icons">${data.prayers.map(p => p.status ? '🕌' : '·').join('')}</div></td>
-                </tr>`;
+                if (!data.allDone && notG && !notG.status) resultText = 'FAIL <span class="priority-fail">NOT G</span>';
+                html += `<tr><td>D${i}</td><td>${data.score}%</td><td class="${data.allDone ? 'success-text' : 'failed-text'}">${resultText}</td><td><div class="mini-icons">${data.habits.map(h => h.status ? '●' : '○').join('')}</div></td><td><div class="mini-icons">${data.prayers.map(p => p.status ? '🕌' : '·').join('')}</div></td></tr>`;
             }
-            container.innerHTML = html || "<tr><td colspan='5' style='padding: 20px;'>No data logged.</td></tr>";
+            container.innerHTML = html || "<tr><td colspan='5'>No data logged.</td></tr>";
         }
 
-        function clearAll() { 
-            const userPass = prompt("Enter password to DELETE ALL progress:");
-            if(userPass === PASS) {
-                if(confirm("Confirm reset?")) { localStorage.clear(); window.location.href = "index.html"; }
-            } else { alert("Incorrect password."); }
+        function copyToClipboard() {
+            let text = "ZACCAD 30 HISTORY LOG\n";
+            Object.keys(historyData).forEach(day => {
+                const d = historyData[day];
+                text += `Day ${day}: Score ${d.score}% | Result: ${d.allDone ? 'PASS' : 'FAIL'}\n`;
+            });
+            navigator.clipboard.writeText(text);
+            alert("History copied to clipboard!");
         }
 
-        updateAnalytics(); renderHistory();
+        function clearAll() { if(confirm("Confirm hard reset?")) { localStorage.clear(); location.reload(); } }
+        
+        updateTheme();
+        updateAnalytics(); 
+        renderHistory();
     </script>
 </body>
 </html>
