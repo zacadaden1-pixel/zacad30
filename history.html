@@ -20,7 +20,7 @@
             border-bottom: 2px solid #fbbf24;
             box-shadow: 0 4px 15px rgba(251, 191, 36, 0.2);
         }
-        .gold-mode .level-badge {
+        .gold-mode #levelBadge {
             background: #fbbf24 !important;
             color: #000 !important;
             box-shadow: 0 0 10px #fbbf24;
@@ -32,8 +32,9 @@
         .purple-mode .navbar {
             background: linear-gradient(90deg, #1e293b 0%, #581c87 50%, #1e293b 100%);
             border-bottom: 2px solid #a855f7;
+            box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3);
         }
-        .purple-mode .level-badge { background: #a855f7 !important; color: #fff !important; }
+        .purple-mode #levelBadge { background: #a855f7 !important; color: #fff !important; }
 
         @media print {
             .no-print { display: none !important; }
@@ -83,13 +84,14 @@
                 </div>
 
                 <div class="no-print" style="margin-top: 25px;">
-                    <button class="btn btn-danger" style="width: 100%; max-width: 280px; margin: 10px auto; display: block;" onclick="clearAll()">RESET CHALLENGE</button>
+                    <button class="btn btn-danger" style="width: 100%; max-width: 280px; margin: 10px auto; display: block;" onclick="resetCheckboxes()">RESET CHALLENGE</button>
                 </div>
             </div>
         </div>
     </section>
 
     <script>
+        const PASS = "SACAD30";
         const historyData = JSON.parse(localStorage.getItem('zac_hist')) || {};
         const currentDay = parseInt(localStorage.getItem('zac_day')) || 1;
         
@@ -100,6 +102,7 @@
             }
             const body = document.getElementById('mainBody');
             const badge = document.getElementById('levelBadge');
+            
             body.classList.remove('gold-mode', 'purple-mode');
             if (streak >= 20) { body.classList.add('purple-mode'); badge.innerText = "LVL 3: ELITE"; }
             else if (streak >= 10) { body.classList.add('gold-mode'); badge.innerText = "LVL 2: GOLD"; }
@@ -145,7 +148,12 @@
             alert("History copied to clipboard!");
         }
 
-        function clearAll() { if(confirm("Confirm hard reset?")) { localStorage.clear(); location.reload(); } }
+        function resetCheckboxes() {
+            if(prompt("Enter Password to Reset") === PASS) {
+                localStorage.clear();
+                location.reload();
+            }
+        }
         
         updateTheme();
         updateAnalytics(); 
