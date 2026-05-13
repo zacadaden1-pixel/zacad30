@@ -6,14 +6,45 @@
     <title>ZACCAD 30 - HOME</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        /* GOLD THEME STYLES (LVL 2) */
+        .gold-mode .navbar {
+            background: linear-gradient(90deg, #1e293b 0%, #854d0e 50%, #1e293b 100%);
+            border-bottom: 2px solid #fbbf24;
+            box-shadow: 0 4px 15px rgba(251, 191, 36, 0.2);
+        }
+        .gold-mode #levelBadge {
+            background: #fbbf24 !important;
+            color: #000 !important;
+            box-shadow: 0 0 10px #fbbf24;
+        }
+        .gold-mode #streakCount {
+            text-shadow: 0 0 10px #fbbf24;
+            color: #fbbf24 !important;
+        }
+
+        /* PURPLE THEME STYLES (LVL 3) */
+        .purple-mode .navbar {
+            background: linear-gradient(90deg, #1e293b 0%, #581c87 50%, #1e293b 100%);
+            border-bottom: 2px solid #a855f7;
+            box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3);
+        }
+        .purple-mode #levelBadge {
+            background: #a855f7 !important;
+            color: #fff !important;
+            box-shadow: 0 0 10px #a855f7;
+        }
+    </style>
 </head>
 <body id="mainBody">
-    <nav class="navbar">
-        <div class="logo">
-            ZACCAD 30 <span id="levelBadge" class="level-badge">LVL 1</span>
+    <nav class="navbar" id="topNav">
+        <div class="logo-container" style="display: flex; flex-direction: column; align-items: flex-start;">
+            <div class="logo" style="line-height: 1;">ZACCAD 30</div>
+            <span id="levelBadge" class="level-badge" style="margin-top: 4px; margin-left: 0;">LVL 1: ROOKIE</span>
         </div>
         <div class="nav-links">
             <a href="index.html" class="nav-btn active">🏠 Home</a>
+            <a href="forge.html" class="nav-btn">⚡ Forge</a>
             <a href="history.html" class="nav-btn">📊 History</a>
         </div>
     </nav>
@@ -21,18 +52,9 @@
     <section class="section hero-bg">
         <div class="dashboard">
             <div class="stats-container">
-                <div class="stat-box">
-                    <h4>Streak 🔥</h4>
-                    <div id="streakCount" class="count" style="color: var(--accent);">0</div>
-                </div>
-                <div class="stat-box">
-                    <h4>Success ✅</h4>
-                    <div id="perfectCount" class="count success">0</div>
-                </div>
-                <div class="stat-box">
-                    <h4>Current Day</h4>
-                    <div id="displayCurrentDay" class="count accent-text">1</div>
-                </div>
+                <div class="stat-box"><h4>Streak 🔥</h4><div id="streakCount" class="count" style="color: var(--accent);">0</div></div>
+                <div class="stat-box"><h4>Success ✅</h4><div id="perfectCount" class="count success">0</div></div>
+                <div class="stat-box"><h4>Current Day</h4><div id="displayCurrentDay" class="count accent-text">1</div></div>
             </div>
 
             <div class="main-layout">
@@ -41,34 +63,21 @@
                         <h3>Daily Habits</h3>
                         <div id="habitInputs">
                             <div class="habit-row-group">
-                                <label class="habit-row">
-                                    <input type="checkbox" class="habit-check" data-name="Gym" data-weight="2"> 
-                                    <span>🏋️ Gym Workout (2 pts)</span>
-                                </label>
-                                <label class="rest-day-label">
-                                    <input type="checkbox" id="gymRest"> 
-                                    <span>Mark as Rest Day</span>
-                                </label>
+                                <label class="habit-row"><input type="checkbox" class="habit-check" data-name="Gym" data-weight="2"> 🏋️ Gym Workout (2 pts)</label>
+                                <label class="rest-day-label"><input type="checkbox" id="gymRest"> <span>Mark Rest</span></label>
                             </div>
-                            
-                            <label class="habit-row" style="border: 1px solid rgba(239, 68, 68, 0.3); padding: 10px; border-radius: 8px;">
+                            <label class="habit-row" style="border: 1px solid #ef4444; padding: 10px; border-radius: 8px;">
                                 <input type="checkbox" class="habit-check" data-name="NOT G" data-weight="3"> 
                                 <strong style="color: #ef4444;">🚫 NOT G (Mandatory)</strong>
                             </label>
-                            
                             <label class="habit-row"><input type="checkbox" class="habit-check" data-name="Read 30m" data-weight="1"> 📚 Read 30 Min (1 pt)</label>
                             <label class="habit-row"><input type="checkbox" class="habit-check" data-name="1L Water" data-weight="1"> 💧 Drink 1L Water (1 pt)</label>
-                            <label class="habit-row"><input type="checkbox" class="habit-check" data-name="Cold Shower" data-weight="1"> 🚿 Early Cold Shower (1 pt)</label>
                         </div>
                     </div>
 
                     <div class="status-card" style="margin-top: 20px;">
-                        <h3>30-Day Progress</h3>
+                        <h3>30 Day Progress</h3>
                         <div class="day-grid" id="trackerGrid"></div>
-                        <div class="btn-group" style="display:flex; gap:10px; margin-top:15px;">
-                            <button class="btn btn-reset" onclick="resetCheckboxes()">RESET</button>
-                            <button class="btn btn-submit" onclick="submitDay()">SUBMIT & NEXT</button>
-                        </div>
                     </div>
                 </div>
 
@@ -83,36 +92,25 @@
                             <label class="habit-row"><input type="checkbox" class="prayer-check" data-name="Isha" data-weight="2"> Isha</label>
                         </div>
                     </div>
+                    
+                    <div class="btn-group" style="display:flex; flex-direction: column; gap:10px; margin-top:20px;">
+                        <button class="btn btn-submit" style="width:100%" onclick="submitDay()">SUBMIT DAY</button>
+                        <button class="btn btn-reset" style="width:100%; opacity: 0.6; font-size: 0.8rem;" onclick="resetCheckboxes()">RESET CHALLENGE</button>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
     <script>
-        const PASS = "SACAD30"; // Set your password here
+        const PASS = "SACAD30";
         let currentDay = parseInt(localStorage.getItem('zac_day')) || 1;
         let historyData = JSON.parse(localStorage.getItem('zac_hist')) || {};
-
-        function saveDraft() {
-            const draft = { habits: [], prayers: [], restDay: document.getElementById('gymRest').checked };
-            document.querySelectorAll('.habit-check').forEach(cb => draft.habits.push(cb.checked));
-            document.querySelectorAll('.prayer-check').forEach(cb => draft.prayers.push(cb.checked));
-            localStorage.setItem('zac_draft', JSON.stringify(draft));
-        }
-
-        function loadDraft() {
-            const draft = JSON.parse(localStorage.getItem('zac_draft'));
-            if (!draft) return;
-            document.getElementById('gymRest').checked = draft.restDay || false;
-            document.querySelectorAll('.habit-check').forEach((cb, i) => cb.checked = draft.habits[i] || false);
-            document.querySelectorAll('.prayer-check').forEach((cb, i) => cb.checked = draft.prayers[i] || false);
-        }
 
         function calculateStreak() {
             let streak = 0;
             for (let i = currentDay - 1; i >= 1; i--) {
-                if (historyData[i] && historyData[i].allDone) streak++;
-                else break;
+                if (historyData[i] && historyData[i].allDone) streak++; else break;
             }
             return streak;
         }
@@ -121,26 +119,27 @@
             let perfect = 0;
             Object.values(historyData).forEach(day => { if(day.allDone) perfect++; });
             const streak = calculateStreak();
-            const body = document.getElementById('mainBody');
-            const levelBadge = document.getElementById('levelBadge');
             
-            body.classList.remove('gold-theme', 'purple-theme');
-            if (streak >= 20) {
-                body.classList.add('purple-theme');
-                levelBadge.innerText = "LVL 3: ELITE";
-                levelBadge.style.background = "#a855f7";
-            } else if (streak >= 10) {
-                body.classList.add('gold-theme');
-                levelBadge.innerText = "LVL 2: GOLD";
-                levelBadge.style.background = "#fbbf24";
-            } else {
-                levelBadge.innerText = "LVL 1";
-                levelBadge.style.background = "#06b6d4";
-            }
-
             document.getElementById('perfectCount').innerText = perfect;
             document.getElementById('streakCount').innerText = streak;
             document.getElementById('displayCurrentDay').innerText = currentDay;
+
+            // DYNAMIC THEME LOGIC
+            const body = document.getElementById('mainBody');
+            const badge = document.getElementById('levelBadge');
+            
+            // Reset themes first
+            body.classList.remove('gold-mode', 'purple-mode');
+
+            if (streak >= 20) {
+                body.classList.add('purple-mode');
+                badge.innerText = "LVL 3: ELITE";
+            } else if (streak >= 10) {
+                body.classList.add('gold-mode');
+                badge.innerText = "LVL 2: GOLD";
+            } else {
+                badge.innerText = "LVL 1: ROOKIE";
+            }
         }
 
         function initGrid() {
@@ -151,85 +150,65 @@
                 day.classList.add('day-box');
                 day.innerText = i;
                 if(i === currentDay) day.classList.add('active');
-                if(historyData[i]) {
-                    day.classList.add(historyData[i].allDone ? 'success' : 'failed');
-                }
+                if(historyData[i]) day.classList.add(historyData[i].allDone ? 'success' : 'failed');
                 grid.appendChild(day);
             }
         }
 
-        function resetCheckboxes() {
-            const userPass = prompt("Enter password to reset today's progress:");
-            if(userPass === PASS) {
-                document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
-                localStorage.removeItem('zac_draft');
-            } else {
-                alert("Wrong password. Don't quit!");
-            }
-        }
-
-        function triggerConfetti() {
-            const streak = calculateStreak();
-            let colors = ['#06b6d4', '#22c55e'];
-            if (streak >= 19) colors = ['#a855f7', '#f472b6', '#ffffff'];
-            else if (streak >= 9) colors = ['#fbbf24', '#f59e0b', '#ffffff'];
-            confetti({ particleCount: 200, spread: 80, origin: { y: 0.6 }, colors: colors });
-        }
-
         function submitDay() {
-            if(currentDay > 30) return alert("Challenge Complete!");
             let dayData = { habits: [], prayers: [], allDone: false, score: 0 };
             const isRestDay = document.getElementById('gymRest').checked;
-            let totalWeightPossible = 0; 
-            let earnedWeight = 0;
-            let failedPriority = false; 
+            let totalPossible = 0; let earned = 0; let failedPriority = false;
 
             document.querySelectorAll('.habit-check').forEach(cb => {
                 const weight = parseInt(cb.dataset.weight);
                 const name = cb.dataset.name;
-                totalWeightPossible += weight;
+                totalPossible += weight;
                 let status = cb.checked;
-                
-                if(name === "Gym" && isRestDay) { status = true; }
-                if(name === "NOT G" && !status) { failedPriority = true; }
-
-                if(status) earnedWeight += weight;
+                if(name === "Gym" && isRestDay) status = true;
+                if(name === "NOT G" && !status) failedPriority = true;
+                if(status) earned += weight;
                 dayData.habits.push({ name: name, status: status });
             });
 
             document.querySelectorAll('.prayer-check').forEach(cb => {
-                const weight = parseInt(cb.dataset.weight);
-                totalWeightPossible += weight;
-                if(cb.checked) earnedWeight += weight;
+                totalPossible += 2;
+                if(cb.checked) earned += 2;
                 dayData.prayers.push({ name: cb.dataset.name, status: cb.checked });
             });
 
-            const successRate = (earnedWeight / totalWeightPossible) * 100;
-            dayData.score = Math.round(successRate);
+            const bonuses = parseInt(localStorage.getItem('zac_bonus_points')) || 0;
+            earned += bonuses;
 
-            if (failedPriority) {
-                dayData.allDone = false; 
+            dayData.score = Math.round((earned / totalPossible) * 100);
+            dayData.allDone = (!failedPriority && dayData.score >= 70);
+
+            if(dayData.allDone) {
+                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#fbbf24', '#ffffff', '#f59e0b'] });
+                setTimeout(() => proceed(dayData), 1000);
             } else {
-                dayData.allDone = (successRate >= 70);
+                proceed(dayData);
             }
+        }
 
-            if(dayData.allDone) triggerConfetti();
+        function proceed(dayData) {
             historyData[currentDay] = dayData;
             currentDay++;
             localStorage.setItem('zac_hist', JSON.stringify(historyData));
             localStorage.setItem('zac_day', currentDay);
-            localStorage.removeItem('zac_draft'); 
-            
-            setTimeout(() => { location.reload(); }, 800);
+            localStorage.removeItem('zac_bonus_points');
+            location.reload();
+        }
+
+        function resetCheckboxes() {
+            if(prompt("Enter Password to Reset") === PASS) {
+                localStorage.clear();
+                location.reload();
+            }
         }
 
         updateStats(); 
         initGrid();
-        loadDraft();
-
-        document.querySelectorAll('input[type="checkbox"]').forEach(input => {
-            input.addEventListener('change', saveDraft);
-        });
     </script>
 </body>
 </html>
