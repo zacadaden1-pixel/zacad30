@@ -58,6 +58,10 @@
 
     <section class="section hero-bg">
         <div class="dashboard">
+            <div class="status-card" style="text-align: center; margin-bottom: 20px; border-bottom: 2px solid var(--accent);">
+                <h2 id="dateRangeDisplay" style="color: var(--accent); letter-spacing: 1px; font-size: 1.2rem; margin: 0;">SET CHALLENGE DATE</h2>
+            </div>
+
             <div class="status-card no-print" style="margin-bottom: 20px;">
                 <h3 style="color:var(--accent); margin-bottom: 15px;">Live Analytics</h3>
                 <div class="analytics-grid">
@@ -102,7 +106,6 @@
             }
             const body = document.getElementById('mainBody');
             const badge = document.getElementById('levelBadge');
-            
             body.classList.remove('gold-mode', 'purple-mode');
             if (streak >= 20) { body.classList.add('purple-mode'); badge.innerText = "LVL 3: ELITE"; }
             else if (streak >= 10) { body.classList.add('gold-mode'); badge.innerText = "LVL 2: GOLD"; }
@@ -127,13 +130,32 @@
 
         function renderHistory() {
             const container = document.getElementById('fullHistoryList');
+            const startStr = localStorage.getItem('zac_start_date');
+            const endStr = localStorage.getItem('zac_end_date');
+            
+            // Handle Date Display Header
+            if(startStr && endStr) {
+                const s = new Date(startStr); const e = new Date(endStr);
+                const opt = { day: 'numeric', month: 'short' };
+                document.getElementById('dateRangeDisplay').innerText = `${s.toLocaleDateString('en-GB', opt)} - ${e.toLocaleDateString('en-GB', opt)} CHALLENGE`;
+            }
+
             let html = "";
             for (let i = 1; i <= 30; i++) {
                 const data = historyData[i]; if (!data) continue;
+                
+                // Calculate specific date for this day
+                let dayLabel = `D${i}`;
+                if(startStr) {
+                    const d = new Date(startStr);
+                    d.setDate(d.getDate() + (i-1));
+                    dayLabel = `D${i} (${d.toLocaleDateString('en-GB', {day:'numeric', month:'short'})})`;
+                }
+
                 let resultText = data.allDone ? 'PASS' : 'FAIL';
                 const notG = data.habits.find(h => h.name === "NOT G");
                 if (!data.allDone && notG && !notG.status) resultText = 'FAIL <span class="priority-fail">NOT G</span>';
-                html += `<tr><td>D${i}</td><td>${data.score}%</td><td class="${data.allDone ? 'success-text' : 'failed-text'}">${resultText}</td><td><div class="mini-icons">${data.habits.map(h => h.status ? '●' : '○').join('')}</div></td><td><div class="mini-icons">${data.prayers.map(p => p.status ? '🕌' : '·').join('')}</div></td></tr>`;
+                html += `<tr><td>${dayLabel}</td><td>${data.score}%</td><td class="${data.allDone ? 'success-text' : 'failed-text'}">${resultText}</td><td><div class="mini-icons">${data.habits.map(h => h.status ? '●' : '○').join('')}</div></td><td><div class="mini-icons">${data.prayers.map(p => p.status ? '🕌' : '·').join('')}</div></td></tr>`;
             }
             container.innerHTML = html || "<tr><td colspan='5'>No data logged.</td></tr>";
         }
