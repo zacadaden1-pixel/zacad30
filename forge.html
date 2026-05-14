@@ -25,7 +25,12 @@
             border: 1px solid rgba(255, 255, 255, 0.08);
             transition: transform 0.2s;
         }
-        .bonus-item:hover { transform: translateY(-2px); background: rgba(255, 255, 255, 0.05); }
+        .bonus-item:hover:not(.locked) { transform: translateY(-2px); background: rgba(255, 255, 255, 0.05); }
+        
+        /* Locked State Styles */
+        .bonus-item.locked { opacity: 0.5; cursor: not-allowed; filter: grayscale(0.5); }
+        .bonus-item.locked input { pointer-events: none; }
+        .points-tag { font-size: 0.7rem; background: var(--accent); color: #000; padding: 2px 6px; border-radius: 4px; font-weight: 900; margin-left: 8px; }
 
         .timer-box { 
             text-align: center; 
@@ -53,10 +58,10 @@
             display: flex; 
             justify-content: center; 
             align-items: center; 
-            gap: 12px; 
+            gap: 10px; 
             background: rgba(255,255,255,0.03);
-            padding: 10px;
-            border-radius: 10px;
+            padding: 15px;
+            border-radius: 12px;
             width: fit-content;
             margin-left: auto;
             margin-right: auto;
@@ -66,13 +71,15 @@
             background: #1e293b; 
             border: 2px solid var(--accent); 
             color: white; 
-            padding: 10px; 
+            padding: 8px; 
             border-radius: 8px; 
-            width: 90px; 
+            width: 70px; 
             text-align: center; 
-            font-size: 1.4rem;
+            font-size: 1.2rem;
             font-weight: bold;
         }
+
+        .input-label { color: #94a3b8; font-size: 0.7rem; text-transform: uppercase; font-weight: 800; }
 
         #finishNotify {
             display: none;
@@ -92,15 +99,15 @@
 
         @keyframes slideDown { from { top: -100px; opacity: 0; } to { top: 25px; opacity: 1; } }
 
-        /* THEME OVERRIDES (STREAK COLORS) */
+        /* THEME OVERRIDES */
         .gold-mode .navbar { background: linear-gradient(90deg, #1e293b 0%, #854d0e 50%, #1e293b 100%); border-bottom: 2px solid #fbbf24; }
         .gold-mode .level-badge { background: #fbbf24 !important; color: #000 !important; }
-        .gold-mode .timer-box, .gold-mode .manual-input, .gold-mode .forge-card { border-color: #fbbf24; }
+        .gold-mode .timer-box, .gold-mode .manual-input, .gold-mode .forge-card, .gold-mode .points-tag { border-color: #fbbf24; background-color: #fbbf24; }
         .gold-mode #timerDisplay { color: #fbbf24; text-shadow: 0 0 20px rgba(251, 191, 36, 0.3); }
 
         .purple-mode .navbar { background: linear-gradient(90deg, #1e293b 0%, #581c87 50%, #1e293b 100%); border-bottom: 2px solid #a855f7; }
         .purple-mode .level-badge { background: #a855f7 !important; color: #fff !important; }
-        .purple-mode .timer-box, .purple-mode .manual-input, .purple-mode .forge-card { border-color: #a855f7; }
+        .purple-mode .timer-box, .purple-mode .manual-input, .purple-mode .forge-card, .purple-mode .points-tag { border-color: #a855f7; background-color: #a855f7; }
         .purple-mode #timerDisplay { color: #a855f7; text-shadow: 0 0 20px rgba(168, 85, 247, 0.3); }
     </style>
 </head>
@@ -130,19 +137,30 @@
             <div class="status-card forge-card">
                 <h2 style="color: var(--accent);">⚡ Bonus Forge</h2>
                 <div id="bonusTasks">
-                    <label class="bonus-item"><span>🎤 180s Talk Topic</span><input type="checkbox" class="bonus-check" data-id="0"></label>
-                    <label class="bonus-item"><span>💪 100 Pushups</span><input type="checkbox" class="bonus-check" data-id="1"></label>
-                    <label class="bonus-item"><span>📻 Watch Full Broadcast</span><input type="checkbox" class="bonus-check" data-id="2"></label>
+                    <label class="bonus-item locked"><span>🎤 180s Talk Topic <span class="points-tag">1PT</span></span><input type="checkbox" class="bonus-check" data-id="0" disabled></label>
+                    <label class="bonus-item locked"><span>💪 100 Pushups <span class="points-tag">1PT</span></span><input type="checkbox" class="bonus-check" data-id="1" disabled></label>
+                    <label class="bonus-item locked"><span>📻 Watch Full Broadcast <span class="points-tag">1PT</span></span><input type="checkbox" class="bonus-check" data-id="2" disabled></label>
+                    <label class="bonus-item locked"><span>🔥 2H Deep Work <span class="points-tag">3PT</span></span><input type="checkbox" class="bonus-check" data-id="3" data-pts="3" disabled></label>
                 </div>
             </div>
 
             <div class="timer-box">
                 <h3 style="margin-bottom: 20px; text-transform: uppercase; letter-spacing: 2px;">🎯 Focus Mode</h3>
+                
                 <div class="timer-input-group" id="inputSection">
-                    <input type="number" id="manualMinutes" class="manual-input" value="60">
-                    <span style="color: #94a3b8; font-weight: bold;">MINS</span>
+                    <div style="display: flex; flex-direction: column; align-items: center;">
+                        <input type="number" id="manualMinutes" class="manual-input" value="60" min="0">
+                        <span class="input-label">Mins</span>
+                    </div>
+                    <span style="color: var(--accent); font-weight: bold; font-size: 1.5rem; margin-top: -15px;">:</span>
+                    <div style="display: flex; flex-direction: column; align-items: center;">
+                        <input type="number" id="manualSeconds" class="manual-input" value="0" min="0" max="59">
+                        <span class="input-label">Secs</span>
+                    </div>
                 </div>
+
                 <div id="timerDisplay">00:00</div>
+                
                 <div class="btn-group" style="justify-content: center; gap: 15px;">
                     <button class="nav-btn" id="timerBtn" onclick="toggleTimer()" style="min-width: 120px;">START</button>
                     <button class="nav-btn" onclick="resetTimer()" style="opacity: 0.7;">RESET</button>
@@ -162,23 +180,14 @@
             for (let i = currentDay - 1; i >= 1; i--) {
                 if (historyData[i] && historyData[i].allDone) streak++; else break;
             }
-            
             const body = document.getElementById('mainBody');
             const badge = document.getElementById('levelBadge');
-            
             body.classList.remove('gold-mode', 'purple-mode');
-            if (streak >= 20) {
-                body.classList.add('purple-mode');
-                badge.innerText = "LVL 3: ELITE";
-            } else if (streak >= 10) {
-                body.classList.add('gold-mode');
-                badge.innerText = "LVL 2: GOLD";
-            } else {
-                badge.innerText = "LVL 1: ROOKIE";
-            }
+            if (streak >= 20) { body.classList.add('purple-mode'); badge.innerText = "LVL 3: ELITE"; } 
+            else if (streak >= 10) { body.classList.add('gold-mode'); badge.innerText = "LVL 2: GOLD"; } 
+            else { badge.innerText = "LVL 1: ROOKIE"; }
         }
 
-        // SYNC DATE HEADER
         function updateDateHeader() {
             const startStr = localStorage.getItem('zac_start_date');
             const endStr = localStorage.getItem('zac_end_date');
@@ -186,6 +195,12 @@
                 const s = new Date(startStr); const e = new Date(endStr);
                 const opt = { day: 'numeric', month: 'short' };
                 document.getElementById('dateRangeDisplay').innerText = `${s.toLocaleDateString('en-GB', opt)} - ${e.toLocaleDateString('en-GB', opt)} CHALLENGE`;
+                
+                // UNLOCK BONUS TASKS IF START DATE EXISTS
+                document.querySelectorAll('.bonus-item').forEach(item => {
+                    item.classList.remove('locked');
+                    item.querySelector('input').disabled = false;
+                });
             }
         }
 
@@ -204,8 +219,10 @@
                 let endTime = localStorage.getItem('zac_timer_end');
                 if (!endTime) {
                     const mins = parseInt(document.getElementById('manualMinutes').value) || 0;
-                    if (mins <= 0) return;
-                    endTime = Date.now() + (mins * 60 * 1000);
+                    const secs = parseInt(document.getElementById('manualSeconds').value) || 0;
+                    const totalMs = ((mins * 60) + secs) * 1000;
+                    if (totalMs <= 0) return;
+                    endTime = Date.now() + totalMs;
                     localStorage.setItem('zac_timer_end', endTime);
                 }
 
@@ -215,8 +232,7 @@
 
                 timerId = setInterval(() => {
                     const now = Date.now();
-                    const remaining = Math.round((endTime - now) / 1000);
-
+                    const remaining = Math.max(0, Math.round((endTime - now) / 1000));
                     if (remaining <= 0) {
                         clearInterval(timerId);
                         updateTimerDisplay(0);
@@ -256,9 +272,16 @@
 
         function saveBonus() {
             const state = {};
-            document.querySelectorAll('.bonus-check').forEach(cb => { state[cb.dataset.id] = cb.checked; });
+            let totalPoints = 0;
+            document.querySelectorAll('.bonus-check').forEach(cb => { 
+                state[cb.dataset.id] = cb.checked; 
+                if(cb.checked) {
+                    // Logic to add 3 points for the specific task, 1 otherwise
+                    totalPoints += cb.dataset.pts ? parseInt(cb.dataset.pts) : 1;
+                }
+            });
             localStorage.setItem('zac_bonus_state', JSON.stringify(state));
-            localStorage.setItem('zac_bonus_points', document.querySelectorAll('.bonus-check:checked').length);
+            localStorage.setItem('zac_bonus_points', totalPoints);
         }
 
         window.onload = () => {
