@@ -123,6 +123,10 @@
 
     <section class="section hero-bg">
         <div class="dashboard">
+            <div class="status-card" style="text-align: center; margin-bottom: 20px; border-bottom: 2px solid var(--accent);">
+                <h2 id="dateRangeDisplay" style="color: var(--accent); letter-spacing: 1px; font-size: 1.2rem; margin: 0;">SET CHALLENGE DATE</h2>
+            </div>
+
             <div class="status-card forge-card">
                 <h2 style="color: var(--accent);">⚡ Bonus Forge</h2>
                 <div id="bonusTasks">
@@ -155,7 +159,6 @@
 
         function updateTheme() {
             let streak = 0;
-            // Calculate streak exactly like Home/History
             for (let i = currentDay - 1; i >= 1; i--) {
                 if (historyData[i] && historyData[i].allDone) streak++; else break;
             }
@@ -172,6 +175,17 @@
                 badge.innerText = "LVL 2: GOLD";
             } else {
                 badge.innerText = "LVL 1: ROOKIE";
+            }
+        }
+
+        // SYNC DATE HEADER
+        function updateDateHeader() {
+            const startStr = localStorage.getItem('zac_start_date');
+            const endStr = localStorage.getItem('zac_end_date');
+            if(startStr && endStr) {
+                const s = new Date(startStr); const e = new Date(endStr);
+                const opt = { day: 'numeric', month: 'short' };
+                document.getElementById('dateRangeDisplay').innerText = `${s.toLocaleDateString('en-GB', opt)} - ${e.toLocaleDateString('en-GB', opt)} CHALLENGE`;
             }
         }
 
@@ -254,6 +268,7 @@
                 cb.addEventListener('change', saveBonus);
             });
             updateTheme();
+            updateDateHeader();
             checkExistingTimer();
         };
     </script>
