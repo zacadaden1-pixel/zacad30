@@ -51,6 +51,10 @@
 
     <section class="section hero-bg">
         <div class="dashboard">
+            <div id="startChallengeContainer" style="text-align: center; margin-bottom: 20px; display: none;">
+                <button class="btn btn-submit" style="background: var(--accent); color: #000; font-weight: 800; padding: 15px 40px; border-radius: 12px; border: none; cursor: pointer;" onclick="startChallenge()">🚀 START CHALLENGE</button>
+            </div>
+
             <div class="stats-container">
                 <div class="stat-box"><h4>Streak 🔥</h4><div id="streakCount" class="count" style="color: var(--accent);">0</div></div>
                 <div class="stat-box"><h4>Success ✅</h4><div id="perfectCount" class="count success">0</div></div>
@@ -64,12 +68,14 @@
                         <div id="habitInputs">
                             <div class="habit-row-group">
                                 <label class="habit-row"><input type="checkbox" class="habit-check auto-save" data-name="Gym" data-weight="2"> 🏋️ Gym Workout (2 pts)</label>
-                                <label class="rest-day-label"><input type="checkbox" id="gymRest" class="auto-save"> <span>Mark Rest</span></label>
+                                <label class="rest-day-label"><input type="checkbox" id="gymRest" class="auto-save"> <span>Mark as Rest day</span></label>
                             </div>
                             <label class="habit-row" style="border: 1px solid #ef4444; padding: 10px; border-radius: 8px;">
                                 <input type="checkbox" class="habit-check auto-save" data-name="NOT G" data-weight="3"> 
                                 <strong style="color: #ef4444;">🚫 NOT G (Mandatory)</strong>
                             </label>
+                            <label class="habit-row"><input type="checkbox" class="habit-check auto-save" data-name="Read Quran" data-weight="1"> 📖 Read Quran j1 (1 pt)</label>
+                            <label class="habit-row"><input type="checkbox" class="habit-check auto-save" data-name="Cold Shower" data-weight="1"> ❄️ Early Cold Shower (1 pt)</label>
                             <label class="habit-row"><input type="checkbox" class="habit-check auto-save" data-name="Read 30m" data-weight="1"> 📚 Read 30 Min (1 pt)</label>
                             <label class="habit-row"><input type="checkbox" class="habit-check auto-save" data-name="1L Water" data-weight="1"> 💧 Drink 1L Water (1 pt)</label>
                         </div>
@@ -83,13 +89,13 @@
 
                 <div class="right-col">
                     <div class="status-card">
-                        <h3 style="color:var(--accent);">🕌 5 Prayers (2 pts each)</h3>
+                        <h3 style="color:var(--accent);">🕌 5 Prayers</h3>
                         <div id="prayerInputs">
-                            <label class="habit-row"><input type="checkbox" class="prayer-check auto-save" data-name="Fajr" data-weight="2"> Fajr</label>
-                            <label class="habit-row"><input type="checkbox" class="prayer-check auto-save" data-name="Dhuhr" data-weight="2"> Dhuhr</label>
-                            <label class="habit-row"><input type="checkbox" class="prayer-check auto-save" data-name="Asr" data-weight="2"> Asr</label>
-                            <label class="habit-row"><input type="checkbox" class="prayer-check auto-save" data-name="Maghrib" data-weight="2"> Maghrib</label>
-                            <label class="habit-row"><input type="checkbox" class="prayer-check auto-save" data-name="Isha" data-weight="2"> Isha</label>
+                            <label class="habit-row"><input type="checkbox" class="prayer-check auto-save" data-name="Fajr" data-weight="3"> Fajr (3 pts)</label>
+                            <label class="habit-row"><input type="checkbox" class="prayer-check auto-save" data-name="Dhuhr" data-weight="1.5"> Dhuhr (1.5 pts)</label>
+                            <label class="habit-row"><input type="checkbox" class="prayer-check auto-save" data-name="Asr" data-weight="3"> Asr (3 pts)</label>
+                            <label class="habit-row"><input type="checkbox" class="prayer-check auto-save" data-name="Maghrib" data-weight="1.5"> Maghrib (1.5 pts)</label>
+                            <label class="habit-row"><input type="checkbox" class="prayer-check auto-save" data-name="Isha" data-weight="1.5"> Isha (1.5 pts)</label>
                         </div>
                     </div>
                     
@@ -107,12 +113,19 @@
         let currentDay = parseInt(localStorage.getItem('zac_day')) || 1;
         let historyData = JSON.parse(localStorage.getItem('zac_hist')) || {};
 
-        // --- AUTO-SAVE LOGIC ---
+        function startChallenge() {
+            const now = new Date();
+            const end = new Date();
+            end.setDate(now.getDate() + 30);
+            localStorage.setItem('zac_start_date', now.toISOString());
+            localStorage.setItem('zac_end_date', end.toISOString());
+            localStorage.setItem('zac_day', 1);
+            location.reload();
+        }
+
         function saveDraft() {
             const draft = {};
-            document.querySelectorAll('.auto-save').forEach((cb, index) => {
-                draft[index] = cb.checked;
-            });
+            document.querySelectorAll('.auto-save').forEach((cb, index) => { draft[index] = cb.checked; });
             localStorage.setItem('zac_draft', JSON.stringify(draft));
         }
 
@@ -125,11 +138,7 @@
             }
         }
 
-        // Attach listeners to all checkboxes
-        document.querySelectorAll('.auto-save').forEach(cb => {
-            cb.addEventListener('change', saveDraft);
-        });
-        // -----------------------
+        document.querySelectorAll('.auto-save').forEach(cb => { cb.addEventListener('change', saveDraft); });
 
         function calculateStreak() {
             let streak = 0;
@@ -143,25 +152,15 @@
             let perfect = 0;
             Object.values(historyData).forEach(day => { if(day.allDone) perfect++; });
             const streak = calculateStreak();
-            
             document.getElementById('perfectCount').innerText = perfect;
             document.getElementById('streakCount').innerText = streak;
             document.getElementById('displayCurrentDay').innerText = currentDay;
-
             const body = document.getElementById('mainBody');
             const badge = document.getElementById('levelBadge');
-            
             body.classList.remove('gold-mode', 'purple-mode');
-
-            if (streak >= 20) {
-                body.classList.add('purple-mode');
-                badge.innerText = "LVL 3: ELITE";
-            } else if (streak >= 10) {
-                body.classList.add('gold-mode');
-                badge.innerText = "LVL 2: GOLD";
-            } else {
-                badge.innerText = "LVL 1: ROOKIE";
-            }
+            if (streak >= 20) { body.classList.add('purple-mode'); badge.innerText = "LVL 3: ELITE"; }
+            else if (streak >= 10) { body.classList.add('gold-mode'); badge.innerText = "LVL 2: GOLD"; }
+            else { badge.innerText = "LVL 1: ROOKIE"; }
         }
 
         function initGrid() {
@@ -183,7 +182,7 @@
             let totalPossible = 0; let earned = 0; let failedPriority = false;
 
             document.querySelectorAll('.habit-check').forEach(cb => {
-                const weight = parseInt(cb.dataset.weight);
+                const weight = parseFloat(cb.dataset.weight);
                 const name = cb.dataset.name;
                 totalPossible += weight;
                 let status = cb.checked;
@@ -194,23 +193,21 @@
             });
 
             document.querySelectorAll('.prayer-check').forEach(cb => {
-                totalPossible += 2;
-                if(cb.checked) earned += 2;
+                const weight = parseFloat(cb.dataset.weight);
+                totalPossible += weight;
+                if(cb.checked) earned += weight;
                 dayData.prayers.push({ name: cb.dataset.name, status: cb.checked });
             });
 
             const bonuses = parseInt(localStorage.getItem('zac_bonus_points')) || 0;
             earned += bonuses;
-
             dayData.score = Math.round((earned / totalPossible) * 100);
             dayData.allDone = (!failedPriority && dayData.score >= 70);
 
             if(dayData.allDone) {
                 confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#fbbf24', '#ffffff', '#f59e0b'] });
                 setTimeout(() => proceed(dayData), 1000);
-            } else {
-                proceed(dayData);
-            }
+            } else { proceed(dayData); }
         }
 
         function proceed(dayData) {
@@ -219,7 +216,7 @@
             localStorage.setItem('zac_hist', JSON.stringify(historyData));
             localStorage.setItem('zac_day', currentDay);
             localStorage.removeItem('zac_bonus_points');
-            localStorage.removeItem('zac_draft'); // Clear draft for the new day
+            localStorage.removeItem('zac_draft'); 
             location.reload();
         }
 
@@ -230,10 +227,14 @@
             }
         }
 
-        // Initialize everything
-        loadDraft();
-        updateStats(); 
-        initGrid();
+        window.onload = () => {
+            if(!localStorage.getItem('zac_start_date')) {
+                document.getElementById('startChallengeContainer').style.display = 'block';
+            }
+            loadDraft();
+            updateStats(); 
+            initGrid();
+        };
     </script>
 </body>
 </html>
