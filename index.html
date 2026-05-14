@@ -7,6 +7,26 @@
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
+        /* PROFESSIONAL NOTIFICATION STYLES */
+        #lockNotification {
+            display: none;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid #ef4444;
+            color: #ef4444;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 600;
+            animation: shake 0.4s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
         /* GOLD THEME STYLES (LVL 2) */
         .gold-mode .navbar {
             background: linear-gradient(90deg, #1e293b 0%, #854d0e 50%, #1e293b 100%);
@@ -51,6 +71,12 @@
 
     <section class="section hero-bg">
         <div class="dashboard">
+            <div id="lockNotification">⚠️ ACTION REQUIRED: You must click "START CHALLENGE" to begin tracking.</div>
+
+            <div class="status-card" style="text-align: center; margin-bottom: 20px; border-bottom: 2px solid var(--accent);">
+                <h2 id="dateRangeDisplay" style="color: var(--accent); letter-spacing: 1px; font-size: 1.2rem; margin: 0;">SET CHALLENGE DATE</h2>
+            </div>
+
             <div id="startChallengeContainer" style="text-align: center; margin-bottom: 20px; display: none;">
                 <button class="btn btn-submit" style="background: var(--accent); color: #000; font-weight: 800; padding: 15px 40px; border-radius: 12px; border: none; cursor: pointer;" onclick="startChallenge()">🚀 START CHALLENGE</button>
             </div>
@@ -67,17 +93,17 @@
                         <h3>Daily Habits</h3>
                         <div id="habitInputs">
                             <div class="habit-row-group">
-                                <label class="habit-row"><input type="checkbox" class="habit-check auto-save" data-name="Gym" data-weight="2"> 🏋️ Gym Workout (2 pts)</label>
-                                <label class="rest-day-label"><input type="checkbox" id="gymRest" class="auto-save"> <span>Mark as Rest day</span></label>
+                                <label class="habit-row"><input type="checkbox" class="habit-check auto-save lockable" data-name="Gym" data-weight="2"> 🏋️ Gym Workout (2 pts)</label>
+                                <label class="rest-day-label"><input type="checkbox" id="gymRest" class="auto-save lockable"> <span>Mark as Rest day</span></label>
                             </div>
                             <label class="habit-row" style="border: 1px solid #ef4444; padding: 10px; border-radius: 8px;">
-                                <input type="checkbox" class="habit-check auto-save" data-name="NOT G" data-weight="3"> 
+                                <input type="checkbox" class="habit-check auto-save lockable" data-name="NOT G" data-weight="3"> 
                                 <strong style="color: #ef4444;">🚫 NOT G (Mandatory)</strong>
                             </label>
-                            <label class="habit-row"><input type="checkbox" class="habit-check auto-save" data-name="Read Quran" data-weight="1"> 📖 Read Quran j1 (1 pt)</label>
-                            <label class="habit-row"><input type="checkbox" class="habit-check auto-save" data-name="Cold Shower" data-weight="1"> ❄️ Early Cold Shower (1 pt)</label>
-                            <label class="habit-row"><input type="checkbox" class="habit-check auto-save" data-name="Read 30m" data-weight="1"> 📚 Read 30 Min (1 pt)</label>
-                            <label class="habit-row"><input type="checkbox" class="habit-check auto-save" data-name="1L Water" data-weight="1"> 💧 Drink 1L Water (1 pt)</label>
+                            <label class="habit-row"><input type="checkbox" class="habit-check auto-save lockable" data-name="Read Quran" data-weight="1"> 📖 Read Quran j1 (1 pt)</label>
+                            <label class="habit-row"><input type="checkbox" class="habit-check auto-save lockable" data-name="Cold Shower" data-weight="1"> ❄️ Early Cold Shower (1 pt)</label>
+                            <label class="habit-row"><input type="checkbox" class="habit-check auto-save lockable" data-name="Read 30m" data-weight="1"> 📚 Read 30 Min (1 pt)</label>
+                            <label class="habit-row"><input type="checkbox" class="habit-check auto-save lockable" data-name="1L Water" data-weight="1"> 💧 Drink 1L Water (1 pt)</label>
                         </div>
                     </div>
 
@@ -91,11 +117,11 @@
                     <div class="status-card">
                         <h3 style="color:var(--accent);">🕌 5 Prayers</h3>
                         <div id="prayerInputs">
-                            <label class="habit-row"><input type="checkbox" class="prayer-check auto-save" data-name="Fajr" data-weight="3"> Fajr (3 pts)</label>
-                            <label class="habit-row"><input type="checkbox" class="prayer-check auto-save" data-name="Dhuhr" data-weight="1.5"> Dhuhr (1.5 pts)</label>
-                            <label class="habit-row"><input type="checkbox" class="prayer-check auto-save" data-name="Asr" data-weight="3"> Asr (3 pts)</label>
-                            <label class="habit-row"><input type="checkbox" class="prayer-check auto-save" data-name="Maghrib" data-weight="1.5"> Maghrib (1.5 pts)</label>
-                            <label class="habit-row"><input type="checkbox" class="prayer-check auto-save" data-name="Isha" data-weight="1.5"> Isha (1.5 pts)</label>
+                            <label class="habit-row"><input type="checkbox" class="prayer-check auto-save lockable" data-name="Fajr" data-weight="3"> Fajr (3 pts)</label>
+                            <label class="habit-row"><input type="checkbox" class="prayer-check auto-save lockable" data-name="Dhuhr" data-weight="1.5"> Dhuhr (1.5 pts)</label>
+                            <label class="habit-row"><input type="checkbox" class="prayer-check auto-save lockable" data-name="Asr" data-weight="3"> Asr (3 pts)</label>
+                            <label class="habit-row"><input type="checkbox" class="prayer-check auto-save lockable" data-name="Maghrib" data-weight="1.5"> Maghrib (1.5 pts)</label>
+                            <label class="habit-row"><input type="checkbox" class="prayer-check auto-save lockable" data-name="Isha" data-weight="1.5"> Isha (1.5 pts)</label>
                         </div>
                     </div>
                     
@@ -123,7 +149,20 @@
             location.reload();
         }
 
+        // PROFESSIONAL LOCK LOGIC
+        function checkChallengeStarted(e) {
+            if (!localStorage.getItem('zac_start_date')) {
+                e.preventDefault();
+                const note = document.getElementById('lockNotification');
+                note.style.display = 'block';
+                // Automatically scroll to the top to see the red warning
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                return false;
+            }
+        }
+
         function saveDraft() {
+            if (!localStorage.getItem('zac_start_date')) return;
             const draft = {};
             document.querySelectorAll('.auto-save').forEach((cb, index) => { draft[index] = cb.checked; });
             localStorage.setItem('zac_draft', JSON.stringify(draft));
@@ -138,7 +177,15 @@
             }
         }
 
-        document.querySelectorAll('.auto-save').forEach(cb => { cb.addEventListener('change', saveDraft); });
+        function updateDateHeader() {
+            const startStr = localStorage.getItem('zac_start_date');
+            const endStr = localStorage.getItem('zac_end_date');
+            if(startStr && endStr) {
+                const s = new Date(startStr); const e = new Date(endStr);
+                const opt = { day: 'numeric', month: 'short' };
+                document.getElementById('dateRangeDisplay').innerText = `${s.toLocaleDateString('en-GB', opt)} - ${e.toLocaleDateString('en-GB', opt)} CHALLENGE`;
+            }
+        }
 
         function calculateStreak() {
             let streak = 0;
@@ -177,6 +224,11 @@
         }
 
         function submitDay() {
+            if (!localStorage.getItem('zac_start_date')) {
+                const note = document.getElementById('lockNotification');
+                note.style.display = 'block';
+                return;
+            }
             let dayData = { habits: [], prayers: [], allDone: false, score: 0 };
             const isRestDay = document.getElementById('gymRest').checked;
             let totalPossible = 0; let earned = 0; let failedPriority = false;
@@ -227,6 +279,12 @@
             }
         }
 
+        // Apply Event Listeners
+        document.querySelectorAll('.lockable').forEach(cb => {
+            cb.addEventListener('click', checkChallengeStarted);
+            cb.addEventListener('change', saveDraft);
+        });
+
         window.onload = () => {
             if(!localStorage.getItem('zac_start_date')) {
                 document.getElementById('startChallengeContainer').style.display = 'block';
@@ -234,6 +292,7 @@
             loadDraft();
             updateStats(); 
             initGrid();
+            updateDateHeader();
         };
     </script>
 </body>
